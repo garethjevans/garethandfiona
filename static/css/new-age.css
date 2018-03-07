@@ -388,6 +388,12 @@ section.gifts .gifts-content h2 {
   color: #333538;
 }
 
+section.gifts .gifts-content i {
+  font-size: 50px;
+  color: #333538 !important;
+  padding: 20px !important;
+}
+
 @media (min-width: 768px) {
   section.gifts .gifts-content h2 {
     font-size: 70px;
