@@ -1,7 +1,7 @@
 all: release
 
 clean:
-	rm -rf kirstenandchris Godeps vendor
+	rm -rf garethandfiona Godeps vendor
 
 install: clean prepare build
 	godep go install
