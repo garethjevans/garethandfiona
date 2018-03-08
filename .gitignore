@@ -25,4 +25,5 @@ _testmain.go
 
 Godeps/
 vendor/
+!/static/vendor/
 manifest.yml
