@@ -201,18 +201,19 @@ func main() {
   r.HandleFunc(newrelic.WrapHandleFunc(app,"/api", handler))
   r.HandleFunc(newrelic.WrapHandleFunc(app,"/invite", handler))
   r.HandleFunc(newrelic.WrapHandleFunc(app,"/ping", handler))
-  r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
 
   // web calls
-  r.HandleFunc("/invite/{id}", ShowInvite).Methods("GET")
-  r.HandleFunc("/rsvp/{id}", ShowRsvp).Methods("GET")
-  r.HandleFunc("/rsvp/{id}/edit", EditRsvp).Methods("GET")
-  r.HandleFunc("/rsvp/{id}/save", SaveRsvp).Methods("POST")
+  r.HandleFunc(newrelic.WrapHandleFunc(app,"/invite/{id}", ShowInvite)).Methods("GET")
+  r.HandleFunc(newrelic.WrapHandleFunc(app,"/rsvp/{id}", ShowRsvp)).Methods("GET")
+  r.HandleFunc(newrelic.WrapHandleFunc(app,"/rsvp/{id}/edit", EditRsvp)).Methods("GET")
+  r.HandleFunc(newrelic.WrapHandleFunc(app,"/rsvp/{id}/save", SaveRsvp)).Methods("POST")
 
   // api calls
-  r.HandleFunc("/api/rsvp", ListRsvp).Methods("GET")
-  r.HandleFunc("/api/rsvp/{id}", GetRsvp).Methods("GET")
-  r.HandleFunc("/api/rsvp/{id}", CreateRsvp).Methods("POST")
+  r.HandleFunc(newrelic.WrapHandleFunc(app,"/api/rsvp", ListRsvp)).Methods("GET")
+  r.HandleFunc(newrelic.WrapHandleFunc(app,"/api/rsvp/{id}", GetRsvp)).Methods("GET")
+  r.HandleFunc(newrelic.WrapHandleFunc(app,"/api/rsvp/{id}", CreateRsvp)).Methods("POST")
 
+  // static calls
+  r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
   http.ListenAndServe(fmt.Sprintf(":%s",port), r)
 }
