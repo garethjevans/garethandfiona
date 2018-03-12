@@ -497,6 +497,47 @@ section.contact ul.list-social li.social-instagram a:hover {
   background-color: #0d95e8;
 }
 
+section.rsvp {
+  position: relative;
+}
+
+section.rsvp h2 {
+  font-family: "Parisienne", Arial, serif;
+  font-weight: bold;
+  font-size: 40px;
+  color: #333538;
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+section.rsvp .badges .badge-link {
+  display: block;
+  margin-bottom: 25px;
+}
+
+section.rsvp .badges .badge-link:last-child {
+  margin-bottom: 0;
+}
+
+section.rsvp .badges .badge-link img {
+  height: 60px;
+}
+
+@media (min-width: 768px) {
+  section.rsvp .badges .badge-link {
+    display: inline-block;
+    margin-bottom: 0;
+  }
+}
+
+@media (min-width: 768px) {
+  section.rsvp h2 {
+    font-family: "Parisienne", Arial, serif;
+    font-weight: bold;
+    font-size: 70px;
+  }
+}
+
 footer {
   padding: 25px 0;
   text-align: center;

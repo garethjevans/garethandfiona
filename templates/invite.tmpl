@@ -1,0 +1,43 @@
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Invite</title>
+
+    <link href="/static/css/invite.css" rel="stylesheet"/>
+
+  </head>
+
+  <body id="page-top">
+
+    <main class='container'>
+
+      <div class='env'>
+        <label for='open-env'>
+          <input type='checkbox' id='open-env' />
+          <label class='top' for='open-env'></label>
+          <div class='content'>
+            <p>Dear 
+{{range $index, $person := .Rsvp.Attendees}}
+  {{ $person.Name }}
+{{end}}
+</p>
+			<p>We're getting married!</p>
+			<p>We'd be delighted if you could join us to celebrate.</p>
+			<p>Fiona &amp; Gareth</p>
+			<p><a href="/rsvp/{{ .Rsvp.ID }}">RSVP</a></p>
+          </div>
+          <div class='rest'></div>
+        </label>
+      </div>
+
+    </main>
+
+  </body>
+
+</html>
