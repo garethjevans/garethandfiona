@@ -12,6 +12,7 @@ prepare: clean
 	go get github.com/newrelic/go-agent
 	go get github.com/magiconair/properties
 	go get github.com/gorilla/schema
+	go get github.com/go-sql-driver/mysql
 
 build: clean prepare
 	godep save

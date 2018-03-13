@@ -23,6 +23,7 @@ _testmain.go
 *.test
 *.prof
 *.sh
+*.txt
 
 Godeps/
 vendor/

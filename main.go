@@ -7,11 +7,10 @@ import (
   "github.com/newrelic/go-agent"
   "html/template"
   "net/http"
-  "encoding/json"
   "fmt"
   "log"
   "os"
-  "errors"
+  "garethandfiona/rsvp"
 )
 
 func getProperties() map[string]string {
@@ -44,59 +43,11 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 type Page struct {
-  Rsvp      *Rsvp
+  Rsvp      *rsvp.Rsvp
   P         map[string]string
 }
 
-type Rsvp struct {
-  ID        string   `json:"id,omitempty" schema:"-"`
-  Email     string   `json:"email,omitempty" schema:"email"`
-  Attendees []Attendee `json:"attendees,omitempty"`
-}
-
-type Attendee struct {
-  Attending bool   `json:"attending,omitempty"`
-  Name      string `json:"name,omitempty"`
-  DietryRequirements    string `json:"dietry_requirements,omitempty"`
-  Wine      string `json:"wine,omitempty"`
-}
-
-var responses []*Rsvp
-
-func ListRsvp(w http.ResponseWriter, r *http.Request) {
-  json.NewEncoder(w).Encode(responses)
-}
-
-func GetRsvpById(id string) (*Rsvp, error) {
-  for _, item := range responses {
-    if item.ID == id {
-	  return item, nil
-	}
-  }
-  return nil, errors.New("Unable to find entry")
-}
-
-func GetRsvp(w http.ResponseWriter, r *http.Request) {
-  params := mux.Vars(r)
-  item, err := GetRsvpById(params["id"])
-  if err != nil {
-    log.Print("Invalid reference: ", err)
-    http.Error(w, err.Error(), http.StatusNotFound)
-	return
-  }
-  json.NewEncoder(w).Encode(item)
-}
-
-func CreateRsvp(w http.ResponseWriter, r *http.Request) {
-  log.Print("Create Rsvp")
-  params := mux.Vars(r)
-  var rsvp Rsvp
-  _ = json.NewDecoder(r.Body).Decode(&rsvp)
-  rsvp.ID = params["id"]
-  responses = append(responses, &rsvp)
-  json.NewEncoder(w).Encode(responses)
-}
-
+var db rsvp.WeddingDatabase
 
 func ShowInvite(w http.ResponseWriter, r *http.Request) {
   showRsvpBase(w,r,"invite")
@@ -110,7 +61,7 @@ func showRsvpBase(w http.ResponseWriter, r *http.Request, v string) {
   log.Print("Show Rsvp")
   params := mux.Vars(r)
   properties := getProperties()
-  item, err := GetRsvpById(params["id"])
+  item, err := db.GetRsvp(params["id"])
   if err != nil {
     log.Print("Invalid reference: ", err)
     http.Error(w, err.Error(), http.StatusNotFound)
@@ -130,7 +81,7 @@ func EditRsvp(w http.ResponseWriter, r *http.Request) {
   log.Print("Edit Rsvp")
   params := mux.Vars(r)
   properties := getProperties()
-  item, err := GetRsvpById(params["id"])
+  item, err := db.GetRsvp(params["id"])
   if err != nil {
     log.Print("Invalid reference: ", err)
     http.Error(w, err.Error(), http.StatusNotFound)
@@ -150,7 +101,7 @@ func SaveRsvp(w http.ResponseWriter, r *http.Request) {
   log.Print("Saving Rsvp")
   params := mux.Vars(r)
 
-  item, err := GetRsvpById(params["id"])
+  item, err := db.GetRsvp(params["id"])
   if err != nil {
     log.Print("Invalid reference: ", err)
     http.Error(w, err.Error(), http.StatusNotFound)
@@ -170,18 +121,29 @@ func SaveRsvp(w http.ResponseWriter, r *http.Request) {
 	return
   }
 
-  target := "http://" + r.Host + "/rsvp/" + item.ID
+  target := "http://" + r.Host + "/rsvp/" + item.RsvpID
   log.Print("Sending Redirect: " + target)
   http.Redirect(w, r, target, http.StatusSeeOther)
 }
 
 func main() {
-  responses = append(responses, &Rsvp{ID: "1", Email: "mark@bob.com", Attendees: []Attendee { Attendee{Attending: true, Name: "Mark", DietryRequirements: "I Love Eggs"}, Attendee{Attending: true, Name:"KDoggie Dog"} }})
-  responses = append(responses, &Rsvp{ID: "2", Email: "rhi@bob.com", Attendees: []Attendee { Attendee{Attending: true, Name: "Rhi", DietryRequirements: "Sausage"} }})
-  responses = append(responses, &Rsvp{ID: "3", Email: "ol@bob.com", Attendees: []Attendee { Attendee{Attending: true, Name: "Oli", DietryRequirements: ""},  Attendee{Attending: false, Name: "Plus 1"} }})
-
   newRelicLicenseKey := os.Getenv("NEWRELIC_LICENSE_KEY")
   newRelicApplicationName := os.Getenv("NEWRELIC_APP_NAME")
+
+  dbUser := os.Getenv("DB_USER")
+  dbPassword := os.Getenv("DB_PASSWORD")
+  dbHost := "127.0.0.1"
+  dbPort := 3306
+
+  mysqlConfig := rsvp.MySQLConfig{ Username:dbUser, Password:dbPassword, Host:dbHost, Port:dbPort }
+  log.Print("Mysql config", mysqlConfig)
+  db, err := rsvp.NewMySQLDB(mysqlConfig)
+  if err != nil {
+    log.Fatal("Unable to connect to database: ", err)
+    os.Exit(1)
+  }
+
+  log.Print("get db", db)
 
   port := os.Getenv("PORT")
   if port == "" {
@@ -189,10 +151,10 @@ func main() {
   }
 
   config := newrelic.NewConfig(newRelicApplicationName, newRelicLicenseKey)
-  app, err := newrelic.NewApplication(config)
+  app, err2 := newrelic.NewApplication(config)
 
-  if err != nil {
-    log.Fatal("Unable to create new relic application: ", err)
+  if err2 != nil {
+    log.Fatal("Unable to create new relic application: ", err2)
     os.Exit(1)
   }
 
@@ -209,9 +171,9 @@ func main() {
   r.HandleFunc(newrelic.WrapHandleFunc(app,"/rsvp/{id}/save", SaveRsvp)).Methods("POST")
 
   // api calls
-  r.HandleFunc(newrelic.WrapHandleFunc(app,"/api/rsvp", ListRsvp)).Methods("GET")
-  r.HandleFunc(newrelic.WrapHandleFunc(app,"/api/rsvp/{id}", GetRsvp)).Methods("GET")
-  r.HandleFunc(newrelic.WrapHandleFunc(app,"/api/rsvp/{id}", CreateRsvp)).Methods("POST")
+  //r.HandleFunc(newrelic.WrapHandleFunc(app,"/api/rsvp", ListRsvp)).Methods("GET")
+  //r.HandleFunc(newrelic.WrapHandleFunc(app,"/api/rsvp/{id}", GetRsvp)).Methods("GET")
+  //r.HandleFunc(newrelic.WrapHandleFunc(app,"/api/rsvp/{id}", CreateRsvp)).Methods("POST")
 
   // static calls
   r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
