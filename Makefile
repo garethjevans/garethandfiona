@@ -15,7 +15,7 @@ prepare: clean
 	go get github.com/go-sql-driver/mysql
 
 build: clean prepare
-	godep save
+	godep save ./...
 	godep go build
 
 test: clean prepare build install

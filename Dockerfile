@@ -1,9 +1,10 @@
-FROM golang:1.8
+FROM golang:1.9
 
-ADD . /go/src/github.com/garethjevans/garethandfiona
+ADD . /go/src/garethandfiona
 
-RUN cd /go/src/github.com/garethjevans/garethandfiona;make
+RUN cd /go/src/garethandfiona && \
+   make
 
-ENTRYPOINT cd /go/src/github.com/garethjevans/garethandfiona/;go run main.go
+ENTRYPOINT cd /go/src/garethandfiona/;go run main.go
 
 EXPOSE 8080

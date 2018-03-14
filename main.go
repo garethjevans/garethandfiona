@@ -47,8 +47,6 @@ type Page struct {
   P         map[string]string
 }
 
-var db rsvp.WeddingDatabase
-
 func ShowInvite(w http.ResponseWriter, r *http.Request) {
   showRsvpBase(w,r,"invite")
 }
@@ -57,11 +55,30 @@ func ShowRsvp(w http.ResponseWriter, r *http.Request) {
   showRsvpBase(w,r,"show_rsvp")
 }
 
+func db() rsvp.WeddingDatabase {
+  dbUser := os.Getenv("DB_USER")
+  dbPassword := os.Getenv("DB_PASSWORD")
+  dbHost := "127.0.0.1"
+  dbPort := 3306
+
+  db, err := rsvp.NewMySQLDB(rsvp.MySQLConfig{ Username:dbUser, Password:dbPassword, Host:dbHost, Port:dbPort })
+  if err != nil {
+    log.Fatal("Unable to connect to database: ", err)
+    os.Exit(1)
+  }
+
+  return db
+}
+
 func showRsvpBase(w http.ResponseWriter, r *http.Request, v string) {
-  log.Print("Show Rsvp")
   params := mux.Vars(r)
-  properties := getProperties()
+  log.Printf("Show Rsvp %s", params["id"])
+
+  db := db()
+  log.Print("get db", db)
   item, err := db.GetRsvp(params["id"])
+  defer db.Close()
+  
   if err != nil {
     log.Print("Invalid reference: ", err)
     http.Error(w, err.Error(), http.StatusNotFound)
@@ -69,7 +86,7 @@ func showRsvpBase(w http.ResponseWriter, r *http.Request, v string) {
   }
 
   t, _ := template.ParseFiles(fmt.Sprintf("templates/%s.tmpl", v))
-  err2 := t.Execute(w, Page {Rsvp: item, P: properties})
+  err2 := t.Execute(w, Page {Rsvp: item, P: getProperties()})
   if err2 != nil {
     log.Print("Unable to parse template: ", err2)
     http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -78,10 +95,13 @@ func showRsvpBase(w http.ResponseWriter, r *http.Request, v string) {
 }
 
 func EditRsvp(w http.ResponseWriter, r *http.Request) {
-  log.Print("Edit Rsvp")
   params := mux.Vars(r)
-  properties := getProperties()
+  log.Printf("Edit Rsvp %s", params["id"])
+
+  db := db()
   item, err := db.GetRsvp(params["id"])
+  defer db.Close()
+
   if err != nil {
     log.Print("Invalid reference: ", err)
     http.Error(w, err.Error(), http.StatusNotFound)
@@ -89,7 +109,7 @@ func EditRsvp(w http.ResponseWriter, r *http.Request) {
   }
 
   t, _ := template.ParseFiles("templates/edit_rsvp.tmpl")
-  err2 := t.Execute(w, Page {Rsvp: item, P: properties})
+  err2 := t.Execute(w, Page {Rsvp: item, P: getProperties()})
   if err2 != nil {
     log.Print("Unable to parse template: ", err2)
     http.Error(w, err2.Error(), http.StatusInternalServerError)
@@ -98,10 +118,13 @@ func EditRsvp(w http.ResponseWriter, r *http.Request) {
 }
 
 func SaveRsvp(w http.ResponseWriter, r *http.Request) {
-  log.Print("Saving Rsvp")
   params := mux.Vars(r)
+  log.Printf("Save Rsvp %s", params["id"])
 
+  db := db()
   item, err := db.GetRsvp(params["id"])
+  defer db.Close()
+
   if err != nil {
     log.Print("Invalid reference: ", err)
     http.Error(w, err.Error(), http.StatusNotFound)
@@ -129,21 +152,6 @@ func SaveRsvp(w http.ResponseWriter, r *http.Request) {
 func main() {
   newRelicLicenseKey := os.Getenv("NEWRELIC_LICENSE_KEY")
   newRelicApplicationName := os.Getenv("NEWRELIC_APP_NAME")
-
-  dbUser := os.Getenv("DB_USER")
-  dbPassword := os.Getenv("DB_PASSWORD")
-  dbHost := "127.0.0.1"
-  dbPort := 3306
-
-  mysqlConfig := rsvp.MySQLConfig{ Username:dbUser, Password:dbPassword, Host:dbHost, Port:dbPort }
-  log.Print("Mysql config", mysqlConfig)
-  db, err := rsvp.NewMySQLDB(mysqlConfig)
-  if err != nil {
-    log.Fatal("Unable to connect to database: ", err)
-    os.Exit(1)
-  }
-
-  log.Print("get db", db)
 
   port := os.Getenv("PORT")
   if port == "" {

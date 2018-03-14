@@ -71,7 +71,7 @@ func NewMySQLDB(config MySQLConfig) (WeddingDatabase, error) {
 		return nil, err
 	}
 
-	conn, err := sql.Open("mysql", config.dataStoreName("rsvp"))
+	conn, err := sql.Open("mysql", config.dataStoreName("wedding"))
 	if err != nil {
 		return nil, fmt.Errorf("mysql: could not get a connection: %v", err)
 	}
@@ -111,6 +111,7 @@ func scanRsvp(s rowScanner) (*Rsvp, error) {
 		rsvp_id       sql.NullString
 		email         sql.NullString
 	)
+
 	if err := s.Scan(&id, &rsvp_id, &email); err != nil {
 		return nil, err
 	}
