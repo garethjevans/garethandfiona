@@ -13,13 +13,14 @@ prepare: clean
 	go get github.com/magiconair/properties
 	go get github.com/gorilla/schema
 	go get github.com/go-sql-driver/mysql
+	go get github.com/simplereach/timeutils
 
 build: clean prepare
 	godep save ./...
 	godep go build
 
 test: clean prepare build install
-	echo "no unit tests"
+	go test -v ./... -cover
 	go vet .
 
 release: clean prepare build install test

@@ -1,17 +1,23 @@
 package rsvp
 
+import (
+  "github.com/simplereach/timeutils"
+)
+
 type Rsvp struct {
-  ID        int64           `json:"id,omitempty" schema:"-"`
-  RsvpID    string           `json:"id,omitempty" schema:"-"`
+  ID        int64            `json:"id,omitempty" schema:"-"`
+  RsvpID    string           `json:"rsvp_id,omitempty" schema:"-"`
+  RsvpDate  timeutils.Time   `json:"rsvp_time,omitempty" schema:"-"`
   Email     string           `json:"email,omitempty" schema:"email"`
-  Attendees []Attendee       `json:"attendees,omitempty"`
+  Name      string           `json:"name,omitempty" schema:"name"`
+  Comments  string           `json:"comments,omitempty" schema:"comments"`
+  Guests    []*Guest         `json:"guests,omitempty"`
 }
 
-type Attendee struct {
+type Guest struct {
   ID        int64            `json:"id,omitempty" schema:"-"`
-  RsvpID    string           `json:"id,omitempty" schema:"-"`
-  Attending bool             `json:"attending,omitempty"`
+  RsvpID    string           `json:"rsvp_id,omitempty" schema:"-"`
   Name      string           `json:"name,omitempty"`
-  DietryRequirements  string `json:"dietry_requirements,omitempty"`
-  Wine      string           `json:"wine,omitempty"`
+  Attending bool             `json:"attending,omitempty"`
+  Comments  string           `json:"comments,omitempty"`
 }

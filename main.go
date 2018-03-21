@@ -47,12 +47,12 @@ type Page struct {
   P         map[string]string
 }
 
-func ShowInvite(w http.ResponseWriter, r *http.Request) {
-  showRsvpBase(w,r,"invite")
-}
-
 func ShowRsvp(w http.ResponseWriter, r *http.Request) {
   showRsvpBase(w,r,"show_rsvp")
+}
+
+func ShowRsvp2(w http.ResponseWriter, r *http.Request) {
+  showRsvpBase(w,r,"show_rsvp2")
 }
 
 func db() rsvp.WeddingDatabase {
@@ -78,7 +78,7 @@ func showRsvpBase(w http.ResponseWriter, r *http.Request, v string) {
   log.Print("get db", db)
   item, err := db.GetRsvp(params["id"])
   defer db.Close()
-  
+
   if err != nil {
     log.Print("Invalid reference: ", err)
     http.Error(w, err.Error(), http.StatusNotFound)
@@ -149,6 +149,38 @@ func SaveRsvp(w http.ResponseWriter, r *http.Request) {
   http.Redirect(w, r, target, http.StatusSeeOther)
 }
 
+func SaveRsvp2(w http.ResponseWriter, r *http.Request) {
+  params := mux.Vars(r)
+  log.Printf("Save Rsvp %s", params["id"])
+
+  db := db()
+  item, err := db.GetRsvp(params["id"])
+  defer db.Close()
+
+  if err != nil {
+    log.Print("Invalid reference: ", err)
+    http.Error(w, err.Error(), http.StatusNotFound)
+	return
+  }
+
+  if r.ParseForm() != nil {
+    log.Print("Unable to parse form")
+  }
+
+  decoder := schema.NewDecoder()
+  err2 := decoder.Decode(item, r.PostForm)
+
+  if err2 != nil {
+    log.Print("Unable to decode rsvp", err2)
+    http.Error(w, err2.Error(), http.StatusInternalServerError)
+	return
+  }
+
+  target := "http://" + r.Host + "/rsvp2/" + item.RsvpID
+  log.Print("Sending Redirect: " + target)
+  http.Redirect(w, r, target, http.StatusSeeOther)
+}
+
 func main() {
   newRelicLicenseKey := os.Getenv("NEWRELIC_LICENSE_KEY")
   newRelicApplicationName := os.Getenv("NEWRELIC_APP_NAME")
@@ -168,15 +200,14 @@ func main() {
 
   r := mux.NewRouter()
   r.HandleFunc(newrelic.WrapHandleFunc(app,"/", handler))
-  r.HandleFunc(newrelic.WrapHandleFunc(app,"/api", handler))
-  r.HandleFunc(newrelic.WrapHandleFunc(app,"/invite", handler))
   r.HandleFunc(newrelic.WrapHandleFunc(app,"/ping", handler))
 
   // web calls
-  r.HandleFunc(newrelic.WrapHandleFunc(app,"/invite/{id}", ShowInvite)).Methods("GET")
   r.HandleFunc(newrelic.WrapHandleFunc(app,"/rsvp/{id}", ShowRsvp)).Methods("GET")
-  r.HandleFunc(newrelic.WrapHandleFunc(app,"/rsvp/{id}/edit", EditRsvp)).Methods("GET")
   r.HandleFunc(newrelic.WrapHandleFunc(app,"/rsvp/{id}/save", SaveRsvp)).Methods("POST")
+
+  r.HandleFunc(newrelic.WrapHandleFunc(app,"/rsvp2/{id}", ShowRsvp2)).Methods("GET")
+  r.HandleFunc(newrelic.WrapHandleFunc(app,"/rsvp2/{id}/save", SaveRsvp2)).Methods("POST")
 
   // api calls
   //r.HandleFunc(newrelic.WrapHandleFunc(app,"/api/rsvp", ListRsvp)).Methods("GET")

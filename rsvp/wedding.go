@@ -1,5 +1,8 @@
 package rsvp
 
+import (
+    "database/sql"
+)
 // RsvpDatabase provides thread-safe access to a database of Rsvps.
 type WeddingDatabase interface {
 	// GetRsvp retrieves a Rsvp by its ID.
@@ -14,4 +17,6 @@ type WeddingDatabase interface {
 	// Close closes the database, freeing up any available resources.
 	// TODO(cbro): Close() should return an error.
 	Close()
+
+	Exec(statement string) (sql.Result, error)
 }
