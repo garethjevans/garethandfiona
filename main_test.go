@@ -24,6 +24,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestHomePage(t *testing.T) {
+  clearTestData(t)
   req, _ := http.NewRequest("GET", "/", nil)
   response := executeRequest(req)
 
@@ -35,6 +36,7 @@ func TestHomePage(t *testing.T) {
 }
 
 func TestShowRsvp(t *testing.T) {
+  clearTestData(t)
   req, _ := http.NewRequest("GET", "/rsvp/1", nil)
   response := executeRequest(req)
 
@@ -42,6 +44,40 @@ func TestShowRsvp(t *testing.T) {
 
   if body := response.Body.String(); !strings.Contains(body, `<form method="post" action="/rsvp/1/save">`) {
     t.Errorf("Expected a correct title. Got %s", body)
+  }
+}
+
+func TestCanUpdateRsvp(t *testing.T) {
+  clearTestData(t)
+  req, _ := http.NewRequest("GET", "/rsvp/1", nil)
+  response := executeRequest(req)
+
+  checkResponseCode(t, http.StatusOK, response.Code)
+
+  if body := response.Body.String(); !strings.Contains(body, `<form method="post" action="/rsvp/1/save">`) {
+    t.Errorf("Expected a correct title. Got %s", body)
+  }
+}
+
+func clearTestData(t *testing.T) {
+  batch := []string{
+	`DELETE FROM rsvp;`,
+	`INSERT INTO rsvp (rsvp_id, email, name, comments) VALUES ('1', 'bob1@bob.com','bob1','');`,
+	`INSERT INTO rsvp (rsvp_id, email, name, comments) VALUES ('2', 'bob2@bob.com','bob2','');`,
+	`INSERT INTO rsvp (rsvp_id, email, name, comments) VALUES ('3', 'bob3@bob.com','bob3','');`,
+	`INSERT INTO rsvp (rsvp_id, email, name, comments) VALUES ('4', 'bob4@bob.com','bob4','');`,
+	`INSERT INTO rsvp (rsvp_id, email, name, comments) VALUES ('5', 'bob5@bob.com','bob5','');`,
+	`DELETE FROM guests;`,
+	`INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('1',1,'bobs friend','');`,
+	`INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('3',1,'friend 1','');`,
+	`INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('3',0,'friend 2','');`,
+  }
+
+  for _, b := range batch {
+    _, err := a.DB.Exec(b)
+    if err != nil {
+      t.Fatalf("sql.Exec: Error: %s\n", err)
+    }
   }
 }
 

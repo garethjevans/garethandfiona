@@ -35,7 +35,6 @@ var createTableStatements = []string{
 type mysqlDB struct {
 	conn        *sql.DB
 
-	insert      *sql.Stmt
 	get         *sql.Stmt
 	getGuests   *sql.Stmt
 	update      *sql.Stmt
@@ -94,9 +93,6 @@ func NewMySQLDB(config MySQLConfig) (WeddingDatabase, error) {
 	}
 	if db.getGuests, err = conn.Prepare(getGuestsStatement); err != nil {
 		return nil, fmt.Errorf("mysql: prepare getGuests: %v", err)
-	}
-	if db.insert, err = conn.Prepare(insertStatement); err != nil {
-		return nil, fmt.Errorf("mysql: prepare insert: %v", err)
 	}
 	if db.update, err = conn.Prepare(updateStatement); err != nil {
 		return nil, fmt.Errorf("mysql: prepare update: %v", err)
@@ -213,22 +209,6 @@ func (db *mysqlDB) getGuestsByRsvpId(id string) ([]*Guest, error) {
 	}
 
 	return guests, nil
-}
-
-const insertStatement = `INSERT INTO rsvp (rsvp_id, email, name) VALUES (?, ?, ?)`
-
-// AddRsvp saves a given Rsvp, assigning it a new ID.
-func (db *mysqlDB) AddRsvp(b *Rsvp) (id int64, err error) {
-	r, err := execAffectingOneRow(db.insert, b.RsvpID, b.Email, b.Name)
-	if err != nil {
-		return 0, err
-	}
-
-	lastInsertID, err := r.LastInsertId()
-	if err != nil {
-		return 0, fmt.Errorf("mysql: could not get last insert ID: %v", err)
-	}
-	return lastInsertID, nil
 }
 
 const updateStatement = `UPDATE rsvp SET email=?, name=?, comments=? WHERE id = ? AND rsvp_id = ?`

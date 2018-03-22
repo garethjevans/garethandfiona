@@ -20,7 +20,7 @@ build: clean prepare
 	godep go build
 
 test: clean prepare build install
-	go test -v ./... -cover
+	go test ./... -cover
 	go vet .
 
 release: clean prepare build install test

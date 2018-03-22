@@ -4,6 +4,7 @@ import (
   "github.com/magiconair/properties"
   "github.com/newrelic/go-agent"
   "github.com/gorilla/mux"
+  "github.com/gorilla/schema"
   "os"
   "log"
   "fmt"
@@ -29,7 +30,6 @@ func (a *App) Initialize(dbUser string, dbPassword string, newRelicAppName strin
 
   config := newrelic.NewConfig(newRelicAppName, newRelicLicenseKey)
   app, err2 := newrelic.NewApplication(config)
-  log.Printf("newrelic app config %s", app)
 
   if err2 != nil {
     log.Fatal("Unable to create new relic application: ", err2)
@@ -38,8 +38,7 @@ func (a *App) Initialize(dbUser string, dbPassword string, newRelicAppName strin
 
   a.DB = db
   a.Router = mux.NewRouter()
-  //a.initializeRoutes(app)
-  a.initializeRoutes()
+  a.initializeRoutes(app)
 }
 
 func (a *App) Run(addr string) {
@@ -91,10 +90,6 @@ type Page struct {
   P         map[string]string
 }
 
-//func ShowRsvp(w http.ResponseWriter, r *http.Request) {
-//  showRsvpBase(w,r,"show_rsvp")
-//}
-
 func (a *App) ShowRsvp(w http.ResponseWriter, r *http.Request) {
   a.showRsvpBase(w,r,"show_rsvp2")
 }
@@ -120,21 +115,37 @@ func (a *App) showRsvpBase(w http.ResponseWriter, r *http.Request, v string) {
   }
 }
 
-//func EditRsvp(w http.ResponseWriter, r *http.Request) {
-//  params := mux.Vars(r)
-//  log.Printf("Edit Rsvp %s", params["id"])
-//
-//  db := db()
-//  item, err := db.GetRsvp(params["id"])
-//  defer db.Close()
-//
-//  if err != nil {
-//    log.Print("Invalid reference: ", err)
-//    http.Error(w, err.Error(), http.StatusNotFound)
-//	return
-//  }
+func (a *App) SaveRsvp(w http.ResponseWriter, r *http.Request) {
+  params := mux.Vars(r)
+  log.Printf("SaveRsvp(%s)", params["id"])
 
-func (a *App) initializeRoutes() {
+  item, err := a.DB.GetRsvp(params["id"])
+
+  if err != nil {
+    log.Print("Invalid reference: ", err)
+    http.Error(w, err.Error(), http.StatusNotFound)
+	return
+  }
+
+  if r.ParseForm() != nil {
+    log.Print("Unable to parse form")
+  }
+
+  decoder := schema.NewDecoder()
+  err2 := decoder.Decode(item, r.PostForm)
+
+  if err2 != nil {
+    log.Print("Unable to decode rsvp", err2)
+    http.Error(w, err2.Error(), http.StatusInternalServerError)
+	return
+  }
+
+  target := "http://" + r.Host + "/rsvp/" + item.RsvpID
+  log.Print("Sending Redirect: " + target)
+  http.Redirect(w, r, target, http.StatusSeeOther)
+}
+
+func (a *App) initializeRoutes(nr newrelic.Application) {
   //a.Router.HandleFunc(newrelic.WrapHandleFunc(app,"/", a.handler))
   //a.Router.HandleFunc(newrelic.WrapHandleFunc(app,"/ping", a.handler))
   a.Router.HandleFunc("/", a.handler)
@@ -142,8 +153,7 @@ func (a *App) initializeRoutes() {
 
   // web calls
   a.Router.HandleFunc("/rsvp/{id}", a.ShowRsvp).Methods("GET")
-  //a.Router.HandleFunc(newrelic.WrapHandleFunc(app,"/rsvp/{id}/save", SaveRsvp)).Methods("POST")
-
+  a.Router.HandleFunc("/rsvp/{id}/save", a.SaveRsvp).Methods("POST")
   //a.Router.HandleFunc(newrelic.WrapHandleFunc(app,"/rsvp2/{id}", ShowRsvp2)).Methods("GET")
   //a.Router.HandleFunc(newrelic.WrapHandleFunc(app,"/rsvp2/{id}/save", SaveRsvp2)).Methods("POST")
 
