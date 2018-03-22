@@ -18,7 +18,7 @@ prepare: clean
 build: clean prepare
 	godep save ./...
 	godep go build
-	gofmt
+	go fmt
 
 test: clean prepare build install
 	go test ./... -cover
