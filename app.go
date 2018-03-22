@@ -139,7 +139,7 @@ func (a *App) SaveRsvp(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Got Rsvp after setting values from form\n%s", item)
 
 	if err2 != nil {
-		log.Print("Unable to decode rsvp", err2)
+		log.Print("Unable to decode rsvp:", err2)
 		http.Error(w, err2.Error(), http.StatusInternalServerError)
 		return
 	}

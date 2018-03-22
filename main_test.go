@@ -61,15 +61,27 @@ func TestCanUpdateRsvp(t *testing.T) {
 	if !strings.Contains(body, `<form method="post" action="/rsvp/1/save">`) {
 		t.Errorf("Expected a correct form. Got %s", body)
 	}
-	if !strings.Contains(body, `<input type="email" class="form-control" id="Email" placeholder="Email" value="bob1@bob.com">`) {
+	if !strings.Contains(body, `<input type="email" class="form-control" name="Email" placeholder="Email" value="bob1@bob.com">`) {
 		t.Errorf("Expected a correct email field. Got %s", body)
 	}
-	if !strings.Contains(body, `<input type="text" class="form-control" id="Name" placeholder="Name" value="bob1">`) {
+	if !strings.Contains(body, `<input type="text" class="form-control" name="Name" placeholder="Name" value="bob1">`) {
 		t.Errorf("Expected a correct name field. Got %s", body)
+	}
+	if !strings.Contains(body, `<input type="text" class="form-control" name="Guests.0.Name" value="bobs friend">`) {
+		t.Errorf("Expected a correct guest 1 name. Got %s", body)
+	}
+	if !strings.Contains(body, `<input type="text" class="form-control" name="Guests.0.Comments" value="">`) {
+		t.Errorf("Expected a correct guest 1 comments. Got %s", body)
+	}
+	if !strings.Contains(body, `<label class="radio-inline"><input type="radio" class="form-control" name="Guests.0.Attending" value="true" checked>Yes</label>`) {
+		t.Errorf("Expected a correct guest 1 attending. Got %s", body)
+	}
+	if !strings.Contains(body, `<label class="radio-inline"><input type="radio" class="form-control" name="Guests.0.Attending" value="false">No</label>`) {
+		t.Errorf("Expected a correct guest 1 attending. Got %s", body)
 	}
 
 	// post update
-	postBody := `Name=bobnew&Email=bobnew@bob.com`
+	postBody := `Name=bobnew&Email=bobnew@bob.com&Guests.0.Name=belinda&Guests.0.Comments=Loves Eggs&Guests.0.Attending=false`
 	postBodyReader := strings.NewReader(postBody)
 
 	// follow redirect
@@ -93,13 +105,25 @@ func TestCanUpdateRsvp(t *testing.T) {
 	if !strings.Contains(body, `<form method="post" action="/rsvp/1/save">`) {
 		t.Errorf("Expected a correct form. Got %s", body)
 	}
-	if !strings.Contains(body, `<input type="email" class="form-control" id="Email" placeholder="Email" value="bobnew@bob.com">`) {
+	if !strings.Contains(body, `<input type="email" class="form-control" name="Email" placeholder="Email" value="bobnew@bob.com">`) {
 		t.Errorf("Expected a correct email field. Got %s", body)
 	}
-	if !strings.Contains(body, `<input type="text" class="form-control" id="Name" placeholder="Name" value="bobnew">`) {
+	if !strings.Contains(body, `<input type="text" class="form-control" name="Name" placeholder="Name" value="bobnew">`) {
 		t.Errorf("Expected a correct name field. Got %s", body)
 	}
 
+	if !strings.Contains(body, `<input type="text" class="form-control" name="Guests.0.Name" value="belinda">`) {
+		t.Errorf("Expected a correct guest 1 name. Got %s", body)
+	}
+	if !strings.Contains(body, `<input type="text" class="form-control" name="Guests.0.Comments" value="Loves Eggs">`) {
+		t.Errorf("Expected a correct guest 1 comments. Got %s", body)
+	}
+	if !strings.Contains(body, `<input type="radio" class="form-control" name="Guests.0.Attending" value="true">`) {
+		t.Errorf("Expected a correct guest 1 attending. Got %s", body)
+	}
+	if !strings.Contains(body, `<input type="radio" class="form-control" name="Guests.0.Attending" value="false" checked>`) {
+		t.Errorf("Expected a correct guest 1 attending. Got %s", body)
+	}
 }
 
 func clearTestData(t *testing.T) {
