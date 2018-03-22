@@ -204,7 +204,7 @@ func (db *mysqlDB) getGuestsByRsvpId(id string) ([]*Guest, error) {
 			return nil, fmt.Errorf("mysql: could not read row: %v", err)
 		}
 
-		log.Printf("converted %s", guest.Name)
+		log.Printf("converted %s", guest)
 		guests = append(guests, guest)
 	}
 
@@ -216,6 +216,7 @@ const updateGuestStatement = `UPDATE guests SET attending = ?, name = ?, comment
 
 // UpdateRsvp updates the entry for a given Rsvp.
 func (db *mysqlDB) UpdateRsvp(b *Rsvp) error {
+	log.Printf("UpdateRsvp(%s)", b)
 	if b.ID == 0 {
 		return errors.New("mysql: Rsvp with unassigned ID passed into updateRsvp")
 	}
@@ -234,6 +235,7 @@ func (db *mysqlDB) UpdateRsvp(b *Rsvp) error {
 }
 
 func (db *mysqlDB) updateGuestByGuest(b *Guest) error {
+	log.Printf("updateGuestByGuest(%s)", b)
 	if b.ID == 0 {
 		return errors.New("mysql: Guest with unassigned ID passed into updateGuest")
 	}

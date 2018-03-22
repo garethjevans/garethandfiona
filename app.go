@@ -120,6 +120,7 @@ func (a *App) SaveRsvp(w http.ResponseWriter, r *http.Request) {
   log.Printf("SaveRsvp(%s)", params["id"])
 
   item, err := a.DB.GetRsvp(params["id"])
+  log.Printf("Got Rsvp from DB\n%s", item)
 
   if err != nil {
     log.Print("Invalid reference: ", err)
@@ -131,14 +132,19 @@ func (a *App) SaveRsvp(w http.ResponseWriter, r *http.Request) {
     log.Print("Unable to parse form")
   }
 
+  log.Printf("Form: %s", r.PostForm)
   decoder := schema.NewDecoder()
   err2 := decoder.Decode(item, r.PostForm)
+
+  log.Printf("Got Rsvp after setting values from form\n%s", item)
 
   if err2 != nil {
     log.Print("Unable to decode rsvp", err2)
     http.Error(w, err2.Error(), http.StatusInternalServerError)
 	return
   }
+
+  a.DB.UpdateRsvp(item)
 
   target := "http://" + r.Host + "/rsvp/" + item.RsvpID
   log.Print("Sending Redirect: " + target)

@@ -2,6 +2,7 @@ package main
 
 import (
   "os"
+  "log"
   "strings"
   "testing"
   "net/http"
@@ -39,7 +40,6 @@ func TestShowRsvp(t *testing.T) {
   clearTestData(t)
   req, _ := http.NewRequest("GET", "/rsvp/1", nil)
   response := executeRequest(req)
-
   checkResponseCode(t, http.StatusOK, response.Code)
 
   if body := response.Body.String(); !strings.Contains(body, `<form method="post" action="/rsvp/1/save">`) {
@@ -50,6 +50,8 @@ func TestShowRsvp(t *testing.T) {
 func TestCanUpdateRsvp(t *testing.T) {
   clearTestData(t)
   req, _ := http.NewRequest("GET", "/rsvp/1", nil)
+
+  log.Printf("Requesting GET /rsvp/1")
   response := executeRequest(req)
 
   checkResponseCode(t, http.StatusOK, response.Code)
@@ -67,8 +69,38 @@ func TestCanUpdateRsvp(t *testing.T) {
   }
 
   // post update
+  postBody := `Name=bobnew&Email=bobnew@bob.com`
+  postBodyReader := strings.NewReader(postBody)
+
   // follow redirect
+  req, _ = http.NewRequest("POST", "/rsvp/1/save", postBodyReader)
+  req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+  log.Printf("Requesting POST /rsvp/1/save")
+  response = executeRequest(req)
+
+  checkResponseCode(t, http.StatusSeeOther, response.Code)
+
   // check form
+  req, _ = http.NewRequest("GET", "/rsvp/1", nil)
+  log.Printf("Requesting GET /rsvp/1")
+  response = executeRequest(req)
+
+  checkResponseCode(t, http.StatusOK, response.Code)
+
+  body = response.Body.String()
+
+  if !strings.Contains(body, `<form method="post" action="/rsvp/1/save">`) {
+    t.Errorf("Expected a correct form. Got %s", body)
+  }
+  if !strings.Contains(body, `<input type="email" class="form-control" id="Email" placeholder="Email" value="bobnew@bob.com">`) {
+    t.Errorf("Expected a correct email field. Got %s", body)
+  }
+  if !strings.Contains(body, `<input type="text" class="form-control" id="Name" placeholder="Name" value="bobnew">`) {
+    t.Errorf("Expected a correct name field. Got %s", body)
+  }
+
+
 }
 
 func clearTestData(t *testing.T) {
