@@ -43,7 +43,7 @@ func TestShowRsvp(t *testing.T) {
   checkResponseCode(t, http.StatusOK, response.Code)
 
   if body := response.Body.String(); !strings.Contains(body, `<form method="post" action="/rsvp/1/save">`) {
-    t.Errorf("Expected a correct title. Got %s", body)
+    t.Errorf("Expected a correct form. Got %s", body)
   }
 }
 
@@ -54,9 +54,21 @@ func TestCanUpdateRsvp(t *testing.T) {
 
   checkResponseCode(t, http.StatusOK, response.Code)
 
-  if body := response.Body.String(); !strings.Contains(body, `<form method="post" action="/rsvp/1/save">`) {
-    t.Errorf("Expected a correct title. Got %s", body)
+  body := response.Body.String()
+
+  if !strings.Contains(body, `<form method="post" action="/rsvp/1/save">`) {
+    t.Errorf("Expected a correct form. Got %s", body)
   }
+  if !strings.Contains(body, `<input type="email" class="form-control" id="Email" placeholder="Email" value="bob1@bob.com">`) {
+    t.Errorf("Expected a correct email field. Got %s", body)
+  }
+  if !strings.Contains(body, `<input type="text" class="form-control" id="Name" placeholder="Name" value="bob1">`) {
+    t.Errorf("Expected a correct name field. Got %s", body)
+  }
+
+  // post update
+  // follow redirect
+  // check form
 }
 
 func clearTestData(t *testing.T) {
