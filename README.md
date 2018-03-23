@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/garethjevans/garethandfiona.svg?branch=master)](https://travis-ci.org/garethjevans/garethandfiona)
+
 # garethandfiona website
 A website using templating, gorilla/mux router and newrelic monitoring. Which utilises the [New Age](https://startbootstrap.com/template-overviews/new-age/) Start Bootstrap theme, with thanks!
 
