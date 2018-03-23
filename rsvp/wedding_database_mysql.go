@@ -112,6 +112,10 @@ func (db *mysqlDB) Exec(statement string) (sql.Result, error) {
 	return db.conn.Exec(statement)
 }
 
+func (db *mysqlDB) DB() *sql.DB {
+	return db.conn
+}
+
 type rowScanner interface {
 	Scan(dest ...interface{}) error
 }

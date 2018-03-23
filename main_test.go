@@ -20,7 +20,18 @@ func TestMain(m *testing.M) {
 		os.Getenv("NEWRELIC_LICENSE_KEY"),
 	)
 
+	log.Printf("Starting Transaction")
+
+	tx, err := a.DB.DB().Begin()
+	if err != nil {
+		log.Fatal("Unable to start transaction")
+	}
+
 	code := m.Run()
+	log.Printf("Rolling Back Transaction")
+
+	tx.Rollback()
+
 	os.Exit(code)
 }
 

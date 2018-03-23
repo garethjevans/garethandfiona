@@ -16,4 +16,6 @@ type WeddingDatabase interface {
 	Close()
 
 	Exec(statement string) (sql.Result, error)
+
+	DB() *sql.DB
 }
