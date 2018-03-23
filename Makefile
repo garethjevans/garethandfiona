@@ -14,11 +14,10 @@ prepare: clean
 	go get github.com/gorilla/schema
 	go get github.com/go-sql-driver/mysql
 	go get github.com/simplereach/timeutils
-	go get github.com/garethjevans/garethandfiona
 
 build: clean prepare
 	godep save ./...
-	godep go build
+	godep go build ./...
 	go fmt
 
 test: clean prepare build install
