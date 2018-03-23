@@ -1,0 +1,34 @@
+hash: 283617adbefc6a1b25e43d59eff218f6692d36bc0ba158adc0cf4bced21aa75b
+updated: 2018-03-23T12:30:04.878551474Z
+imports:
+- name: github.com/go-sql-driver/mysql
+  version: 1a676ac6e4dce68e9303a1800773861350374a9e
+- name: github.com/gorilla/context
+  version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
+- name: github.com/gorilla/mux
+  version: 07ba1fd60e210dc5cc6f86ec25dc9ecc7c95c295
+- name: github.com/gorilla/schema
+  version: d0e4c24cff97ae983e9847e0ed5a02dc10013d41
+- name: github.com/magiconair/properties
+  version: 2c9e9502788518c97fe44e8955cd069417ee89df
+- name: github.com/newrelic/go-agent
+  version: f5bce3387232559bcbe6a5f8227c4bf508dac1ba
+  subpackages:
+  - internal
+  - internal/cat
+  - internal/jsonx
+  - internal/logger
+  - internal/sysinfo
+  - internal/utilization
+- name: github.com/simplereach/timeutils
+  version: 1a719258b86a08630289b86902ab16817ba641e9
+- name: google.golang.org/appengine
+  version: 5bee14b453b4c71be47ec1781b0fa61c2ea182db
+  subpackages:
+  - cloudsql
+- name: gopkg.in/mgo.v2
+  version: 3f83fa5005286a7fe593b055f0d7771a7dce4655
+  subpackages:
+  - bson
+  - internal/json
+testImports: []

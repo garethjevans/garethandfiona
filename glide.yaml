@@ -1,0 +1,26 @@
+package: garethandfiona
+import:
+- package: github.com/go-sql-driver/mysql
+  version: 1a676ac6e4dce68e9303a1800773861350374a9e
+- package: github.com/gorilla/mux
+  version: 07ba1fd60e210dc5cc6f86ec25dc9ecc7c95c295
+- package: github.com/gorilla/schema
+  version: ^1.0.1
+- package: github.com/magiconair/properties
+  version: 2c9e9502788518c97fe44e8955cd069417ee89df
+- package: github.com/newrelic/go-agent
+  version: ^1.11.0
+  subpackages:
+  - internal
+  - internal/cat
+  - internal/jsonx
+  - internal/logger
+  - internal/sysinfo
+  - internal/utilization
+- package: github.com/simplereach/timeutils
+  version: ^1.2.0
+- package: gopkg.in/mgo.v2
+  version: 3f83fa5005286a7fe593b055f0d7771a7dce4655
+  subpackages:
+  - bson
+  - internal/json
