@@ -152,16 +152,12 @@ func (a *App) SaveRsvp(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *App) initializeRoutes(nr newrelic.Application) {
-	//a.Router.HandleFunc(newrelic.WrapHandleFunc(app,"/", a.handler))
-	//a.Router.HandleFunc(newrelic.WrapHandleFunc(app,"/ping", a.handler))
-	a.Router.HandleFunc("/", a.handler)
-	a.Router.HandleFunc("/ping", a.handler)
+	a.Router.HandleFunc(newrelic.WrapHandleFunc(nr, "/", a.handler))
+	a.Router.HandleFunc(newrelic.WrapHandleFunc(nr, "/ping", a.handler))
 
 	// web calls
-	a.Router.HandleFunc("/rsvp/{id}", a.ShowRsvp).Methods("GET")
-	a.Router.HandleFunc("/rsvp/{id}/save", a.SaveRsvp).Methods("POST")
-	//a.Router.HandleFunc(newrelic.WrapHandleFunc(app,"/rsvp2/{id}", ShowRsvp2)).Methods("GET")
-	//a.Router.HandleFunc(newrelic.WrapHandleFunc(app,"/rsvp2/{id}/save", SaveRsvp2)).Methods("POST")
+	a.Router.HandleFunc(newrelic.WrapHandleFunc(nr, "/rsvp/{id}", a.ShowRsvp)).Methods("GET")
+	a.Router.HandleFunc(newrelic.WrapHandleFunc(nr, "/rsvp/{id}/save", a.SaveRsvp)).Methods("POST")
 
 	// api calls
 	//r.HandleFunc(newrelic.WrapHandleFunc(app,"/api/rsvp", ListRsvp)).Methods("GET")

@@ -11,9 +11,10 @@ prepare: clean
 
 build: clean prepare
 	glide update
-	go fmt
+	go build
 
 test: clean prepare build install
+	go fmt
 	go test ./... -cover
 	go vet .
 
