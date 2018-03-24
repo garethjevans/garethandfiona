@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"garethandfiona/rsvp"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/schema"
 	"github.com/magiconair/properties"
@@ -15,14 +14,14 @@ import (
 
 type App struct {
 	Router *mux.Router
-	DB     rsvp.WeddingDatabase
+	DB     WeddingDatabase
 }
 
 func (a *App) Initialize(dbUser string, dbPassword string, newRelicAppName string, newRelicLicenseKey string) {
 	dbHost := "127.0.0.1"
 	dbPort := 3306
 
-	db, err := rsvp.NewMySQLDB(rsvp.MySQLConfig{Username: dbUser, Password: dbPassword, Host: dbHost, Port: dbPort})
+	db, err := NewMySQLDB(MySQLConfig{Username: dbUser, Password: dbPassword, Host: dbHost, Port: dbPort})
 	if err != nil {
 		log.Fatal("Unable to connect to database: ", err)
 		os.Exit(1)
@@ -86,7 +85,7 @@ func (a *App) handler(w http.ResponseWriter, r *http.Request) {
 }
 
 type Page struct {
-	Rsvp *rsvp.Rsvp
+	Rsvp *Rsvp
 	P    map[string]string
 }
 

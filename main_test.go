@@ -35,7 +35,7 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func TestHomePage(t *testing.T) {
+func TestHomePageViaWeb(t *testing.T) {
 	clearTestData(t)
 	req, _ := http.NewRequest("GET", "/", nil)
 	response := executeRequest(req)
@@ -47,7 +47,7 @@ func TestHomePage(t *testing.T) {
 	}
 }
 
-func TestShowRsvp(t *testing.T) {
+func TestShowRsvpViaWeb(t *testing.T) {
 	clearTestData(t)
 	req, _ := http.NewRequest("GET", "/rsvp/1", nil)
 	response := executeRequest(req)
@@ -58,7 +58,7 @@ func TestShowRsvp(t *testing.T) {
 	}
 }
 
-func TestCanUpdateRsvp(t *testing.T) {
+func TestCanUpdateRsvpViaWeb(t *testing.T) {
 	clearTestData(t)
 	req, _ := http.NewRequest("GET", "/rsvp/1", nil)
 

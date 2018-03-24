@@ -1,12 +1,12 @@
-package rsvp
+package main
 
 import (
 	"database/sql"
 	"database/sql/driver"
 	"errors"
 	"fmt"
-	"log"
 	"github.com/go-sql-driver/mysql"
+	"log"
 )
 
 var createTableStatements = []string{
@@ -33,7 +33,7 @@ var createTableStatements = []string{
 
 // mysqlDB persists Rsvps to a MySQL instance.
 type mysqlDB struct {
-	conn        *sql.DB
+	conn *sql.DB
 
 	get         *sql.Stmt
 	getGuests   *sql.Stmt
@@ -46,9 +46,9 @@ var _ WeddingDatabase = &mysqlDB{}
 
 type MySQLConfig struct {
 	Username, Password string
-	Host string
-	Port int
-	UnixSocket string
+	Host               string
+	Port               int
+	UnixSocket         string
 }
 
 // dataStoreName returns a connection string suitable for sql.Open.
@@ -122,11 +122,11 @@ type rowScanner interface {
 
 func scanRsvp(s rowScanner) (*Rsvp, error) {
 	var (
-		id            int64
-		rsvp_id       sql.NullString
-		email         sql.NullString
-		name          sql.NullString
-		comments      sql.NullString
+		id       int64
+		rsvp_id  sql.NullString
+		email    sql.NullString
+		name     sql.NullString
+		comments sql.NullString
 	)
 
 	if err := s.Scan(&id, &rsvp_id, &email, &name, &comments); err != nil {
@@ -134,22 +134,22 @@ func scanRsvp(s rowScanner) (*Rsvp, error) {
 	}
 
 	Rsvp := &Rsvp{
-		ID:           id,
-		RsvpID:       rsvp_id.String,
-		Email:        email.String,
-		Name:         name.String,
-		Comments:     comments.String,
+		ID:       id,
+		RsvpID:   rsvp_id.String,
+		Email:    email.String,
+		Name:     name.String,
+		Comments: comments.String,
 	}
 	return Rsvp, nil
 }
 
 func scanGuest(s rowScanner) (*Guest, error) {
 	var (
-		id            int64
-		rsvp_id       sql.NullString
-		name          sql.NullString
-		attending     sql.NullBool
-		comments      sql.NullString
+		id        int64
+		rsvp_id   sql.NullString
+		name      sql.NullString
+		attending sql.NullBool
+		comments  sql.NullString
 	)
 
 	if err := s.Scan(&id, &rsvp_id, &name, &attending, &comments); err != nil {
@@ -157,11 +157,11 @@ func scanGuest(s rowScanner) (*Guest, error) {
 	}
 
 	Guest := &Guest{
-		ID:           id,
-		RsvpID:       rsvp_id.String,
-		Name:         name.String,
-		Attending:    attending.Bool,
-		Comments:     comments.String,
+		ID:        id,
+		RsvpID:    rsvp_id.String,
+		Name:      name.String,
+		Attending: attending.Bool,
+		Comments:  comments.String,
 	}
 	return Guest, nil
 }
@@ -174,7 +174,7 @@ func (db *mysqlDB) GetRsvp(id string) (*Rsvp, error) {
 	log.Printf("GetRsvp(%s)", id)
 	Rsvp, err := scanRsvp(db.get.QueryRow(id))
 	if err == sql.ErrNoRows {
-		return nil, fmt.Errorf("mysql: could not find Rsvp with rsvp_id %d", id)
+		return nil, fmt.Errorf("mysql: could not find Rsvp with rsvp_id %s", id)
 	}
 	if err != nil {
 		return nil, fmt.Errorf("mysql: could not get Rsvp: %v", err)
@@ -231,7 +231,7 @@ func (db *mysqlDB) UpdateRsvp(b *Rsvp) error {
 
 	_, err := execAffectingOneRow(db.update, b.Email, b.Name, b.Comments, b.ID, b.RsvpID)
 
-    for _, guest := range b.Guests {
+	for _, guest := range b.Guests {
 		db.updateGuestByGuest(guest)
 	}
 
@@ -248,7 +248,7 @@ func (db *mysqlDB) updateGuestByGuest(b *Guest) error {
 		return errors.New("mysql: Guest with unassigned RsvpID passed into updateGuest")
 	}
 
-	_, err := execAffectingOneRow(db.updateGuest,b.Attending, b.Name, b.Comments, b.ID, b.RsvpID)
+	_, err := execAffectingOneRow(db.updateGuest, b.Attending, b.Name, b.Comments, b.ID, b.RsvpID)
 	return err
 }
 

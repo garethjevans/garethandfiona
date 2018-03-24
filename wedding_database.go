@@ -1,8 +1,9 @@
-package rsvp
+package main
 
 import (
-    "database/sql"
+	"database/sql"
 )
+
 // RsvpDatabase provides thread-safe access to a database of Rsvps.
 type WeddingDatabase interface {
 	// GetRsvp retrieves a Rsvp by its ID.
