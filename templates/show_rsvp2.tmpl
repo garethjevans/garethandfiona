@@ -34,6 +34,11 @@
                 </div>
                 <div class="card-body">
                   <form method="post" action="/rsvp/{{ .Rsvp.RsvpID }}/save">
+{{if eq .Rsvp.Status "attending"}}
+                    <h2>You're Coming!</h2>
+{{else if eq .Rsvp.Status "notattending"}}
+                    <h2>Sorry you can't make it</h2>
+{{end}}
                     <div class="form-row">
                       <div class="form-group col-md-6">
                         <label for="Name">Name</label>
