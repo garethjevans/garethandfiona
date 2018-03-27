@@ -11,7 +11,8 @@ import (
 
 var a App
 
-func TestMain(m *testing.M) {
+func TestApp(t *testing.T) {
+	// <setup code>
 	a = App{}
 	a.Initialize(
 		"root",
@@ -27,16 +28,17 @@ func TestMain(m *testing.M) {
 		log.Fatal("Unable to start transaction")
 	}
 
-	code := m.Run()
+	t.Run("homePageViaWeb", homePageViaWeb)
+	t.Run("showRsvpViaWeb", showRsvpViaWeb)
+	t.Run("canUpdateRsvpViaWeb", canUpdateRsvpViaWeb)
+
+	// <tear-down code>
 	log.Printf("Rolling Back Transaction")
-
 	tx.Rollback()
-
-	os.Exit(code)
 }
 
-func TestHomePageViaWeb(t *testing.T) {
-	clearTestData(t)
+func homePageViaWeb(t *testing.T) {
+	clearTestData(t, a)
 	req, _ := http.NewRequest("GET", "/", nil)
 	response := executeRequest(req)
 
@@ -47,8 +49,8 @@ func TestHomePageViaWeb(t *testing.T) {
 	}
 }
 
-func TestShowRsvpViaWeb(t *testing.T) {
-	clearTestData(t)
+func showRsvpViaWeb(t *testing.T) {
+	clearTestData(t, a)
 	req, _ := http.NewRequest("GET", "/rsvp/1", nil)
 	response := executeRequest(req)
 	checkResponseCode(t, http.StatusOK, response.Code)
@@ -58,8 +60,8 @@ func TestShowRsvpViaWeb(t *testing.T) {
 	}
 }
 
-func TestCanUpdateRsvpViaWeb(t *testing.T) {
-	clearTestData(t)
+func canUpdateRsvpViaWeb(t *testing.T) {
+	clearTestData(t, a)
 	req, _ := http.NewRequest("GET", "/rsvp/1", nil)
 
 	log.Printf("Requesting GET /rsvp/1")
@@ -137,7 +139,7 @@ func TestCanUpdateRsvpViaWeb(t *testing.T) {
 	}
 }
 
-func clearTestData(t *testing.T) {
+func clearTestData(t *testing.T, a App) {
 	batch := []string{
 		`DELETE FROM rsvp;`,
 		`INSERT INTO rsvp (rsvp_id, status, email, name, comments) VALUES ('1', '', 'bob1@bob.com','bob1','');`,

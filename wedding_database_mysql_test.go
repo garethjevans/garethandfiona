@@ -1,43 +1,42 @@
 package main
 
 import (
+	"log"
+	"os"
 	"testing"
 )
 
-func TestLoadRsvpById(t *testing.T) {
-	batch := []string{
-		`DELETE FROM rsvp;`,
-		`INSERT INTO rsvp (rsvp_id, status, email, name, comments) VALUES ('1', '', 'bob1@bob.com','bob1','');`,
-		`INSERT INTO rsvp (rsvp_id, status, email, name, comments) VALUES ('2', '', 'bob2@bob.com','bob2','');`,
-		`INSERT INTO rsvp (rsvp_id, status, email, name, comments) VALUES ('3', '', 'bob3@bob.com','bob3','');`,
-		`INSERT INTO rsvp (rsvp_id, status, email, name, comments) VALUES ('4', '', 'bob4@bob.com','bob4','');`,
-		`INSERT INTO rsvp (rsvp_id, status, email, name, comments) VALUES ('5', '', 'bob5@bob.com','bob5','');`,
-		`DELETE FROM guests;`,
-		`INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('1',1,'bobs friend','');`,
-		`INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('3',1,'friend 1','');`,
-		`INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('3',0,'friend 2','');`,
-	}
+var b App
 
-	db, err := NewMySQLDB(MySQLConfig{Username: "root", Password: "password1", Host: "127.0.0.1", Port: 3306})
+func TestDatabase(t *testing.T) {
+	// <setup code>
+	b = App{}
+	b.Initialize(
+		"root",
+		"password1",
+		"app_name",
+		os.Getenv("NEWRELIC_LICENSE_KEY"),
+	)
+
+	log.Printf("Starting Transaction")
+
+	tx, err := b.DB.DB().Begin()
 	if err != nil {
-		t.Fatalf("Unable to connect to database: %s", err)
+		log.Fatal("Unable to start transaction")
 	}
 
-	if err != nil {
-		t.Fatalf("sql.Open : Error : %s", err)
-	}
+	t.Run("loadRsvpById", loadRsvpById)
+	t.Run("canUpdateRsvp", canUpdateRsvp)
 
-	defer db.Close()
+	// <tear-down code>
+	log.Printf("Rolling Back Transaction")
+	tx.Rollback()
+}
 
-	for _, b := range batch {
-		_, err = db.Exec(b)
-		if err != nil {
-			t.Fatalf("sql.Exec: Error: %s", err)
-		}
-	}
-
+func loadRsvpById(t *testing.T) {
+	clearTestDataForDatabase(t, b)
 	// bob1
-	rsvp, err := db.GetRsvp("1")
+	rsvp, err := b.DB.GetRsvp("1")
 	if err != nil {
 		t.Fatalf("Too bad! unexpected error: %s", err)
 	}
@@ -55,7 +54,7 @@ func TestLoadRsvpById(t *testing.T) {
 	}
 
 	// bob2
-	rsvp, err = db.GetRsvp("2")
+	rsvp, err = b.DB.GetRsvp("2")
 	if err != nil {
 		t.Fatalf("Too bad! unexpected error: %s", err)
 	}
@@ -73,7 +72,7 @@ func TestLoadRsvpById(t *testing.T) {
 	}
 
 	// bob3
-	rsvp, err = db.GetRsvp("3")
+	rsvp, err = b.DB.GetRsvp("3")
 	if err != nil {
 		t.Fatalf("Too bad! unexpected error: %s", err)
 	}
@@ -91,34 +90,11 @@ func TestLoadRsvpById(t *testing.T) {
 	}
 }
 
-func TestCanUpdateRsvp(t *testing.T) {
-	batch := []string{
-		`DELETE FROM rsvp;`,
-		`INSERT INTO rsvp (rsvp_id, status, email, name, comments) VALUES ('1', '', 'bob1@bob.com','bob1','');`,
-		`DELETE FROM guests;`,
-		`INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('1',1,'bobs friend','');`,
-	}
-
-	db, err := NewMySQLDB(MySQLConfig{Username: "root", Password: "password1", Host: "127.0.0.1", Port: 3306})
-	if err != nil {
-		t.Fatalf("Unable to connect to database: %s", err)
-	}
-
-	if err != nil {
-		t.Fatalf("sql.Open : Error : %s\n", err)
-	}
-
-	defer db.Close()
-
-	for _, b := range batch {
-		_, err = db.Exec(b)
-		if err != nil {
-			t.Fatalf("sql.Exec: Error: %s\n", err)
-		}
-	}
+func canUpdateRsvp(t *testing.T) {
+	clearTestDataForDatabase(t, b)
 
 	// bob1
-	rsvp, err := db.GetRsvp("1")
+	rsvp, err := b.DB.GetRsvp("1")
 	if err != nil {
 		t.Fatalf("Too bad! unexpected error: %s", err)
 	}
@@ -145,9 +121,9 @@ func TestCanUpdateRsvp(t *testing.T) {
 
 	rsvp.Guests[0].Attending = false
 
-	db.UpdateRsvp(rsvp)
+	b.DB.UpdateRsvp(rsvp)
 
-	rsvp, err = db.GetRsvp("1")
+	rsvp, err = b.DB.GetRsvp("1")
 	if err != nil {
 		t.Fatalf("Too bad! unexpected error: %s", err)
 	}
@@ -170,5 +146,27 @@ func TestCanUpdateRsvp(t *testing.T) {
 
 	if rsvp.Guests[0].Attending {
 		t.Fatalf("Guest 1 is not supposed to be attending")
+	}
+}
+
+func clearTestDataForDatabase(t *testing.T, a App) {
+	batch := []string{
+		`DELETE FROM rsvp;`,
+		`INSERT INTO rsvp (rsvp_id, status, email, name, comments) VALUES ('1', '', 'bob1@bob.com','bob1','');`,
+		`INSERT INTO rsvp (rsvp_id, status, email, name, comments) VALUES ('2', '', 'bob2@bob.com','bob2','');`,
+		`INSERT INTO rsvp (rsvp_id, status, email, name, comments) VALUES ('3', '', 'bob3@bob.com','bob3','');`,
+		`INSERT INTO rsvp (rsvp_id, status, email, name, comments) VALUES ('4', '', 'bob4@bob.com','bob4','');`,
+		`INSERT INTO rsvp (rsvp_id, status, email, name, comments) VALUES ('5', '', 'bob5@bob.com','bob5','');`,
+		`DELETE FROM guests;`,
+		`INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('1',1,'bobs friend','');`,
+		`INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('3',1,'friend 1','');`,
+		`INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('3',0,'friend 2','');`,
+	}
+
+	for _, b := range batch {
+		_, err := a.DB.Exec(b)
+		if err != nil {
+			t.Fatalf("sql.Exec: Error: %s\n", err)
+		}
 	}
 }
