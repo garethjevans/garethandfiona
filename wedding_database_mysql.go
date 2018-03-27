@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/go-sql-driver/mysql"
 	"log"
+	"time"
 )
 
 var createTableStatements = []string{
@@ -49,7 +50,6 @@ type MySQLConfig struct {
 	Username, Password string
 	Host               string
 	Port               int
-	UnixSocket         string
 }
 
 // dataStoreName returns a connection string suitable for sql.Open.
@@ -63,11 +63,7 @@ func (c MySQLConfig) dataStoreName(databaseName string) string {
 		}
 		cred = cred + "@"
 	}
-
-	if c.UnixSocket != "" {
-		return fmt.Sprintf("%sunix(%s)/%s", cred, c.UnixSocket, databaseName)
-	}
-	return fmt.Sprintf("%stcp([%s]:%d)/%s", cred, c.Host, c.Port, databaseName)
+	return fmt.Sprintf("%stcp([%s]:%d)/%s?parseTime=true", cred, c.Host, c.Port, databaseName)
 }
 
 // newMySQLDB creates a new WeddingDatabase backed by a given MySQL server.
@@ -123,17 +119,20 @@ type rowScanner interface {
 
 func scanRsvp(s rowScanner) (*Rsvp, error) {
 	var (
-		id       int64
-		rsvp_id  sql.NullString
-		status   sql.NullString
-		email    sql.NullString
-		name     sql.NullString
-		comments sql.NullString
+		id        int64
+		rsvp_id   sql.NullString
+		rsvp_date mysql.NullTime
+		status    sql.NullString
+		email     sql.NullString
+		name      sql.NullString
+		comments  sql.NullString
 	)
 
-	if err := s.Scan(&id, &rsvp_id, &status, &email, &name, &comments); err != nil {
+	if err := s.Scan(&id, &rsvp_id, &rsvp_date, &status, &email, &name, &comments); err != nil {
 		return nil, err
 	}
+
+	log.Printf("Date is valid - %t", rsvp_date.Valid)
 
 	Rsvp := &Rsvp{
 		ID:       id,
@@ -143,6 +142,11 @@ func scanRsvp(s rowScanner) (*Rsvp, error) {
 		Name:     name.String,
 		Comments: comments.String,
 	}
+
+	if rsvp_date.Valid {
+		Rsvp.RsvpDate = &rsvp_date.Time
+	}
+
 	return Rsvp, nil
 }
 
@@ -169,7 +173,7 @@ func scanGuest(s rowScanner) (*Guest, error) {
 	return Guest, nil
 }
 
-const getStatement = `SELECT id,rsvp_id,status,email,name,comments FROM rsvp WHERE rsvp_id = ?`
+const getStatement = `SELECT id,rsvp_id,rsvp_date,status,email,name,comments FROM rsvp WHERE rsvp_id = ?`
 const getGuestsStatement = `SELECT id,rsvp_id,name,attending,comments FROM guests WHERE rsvp_id = ?`
 
 // GetRsvp retrieves a Rsvp by its ID.
@@ -218,7 +222,7 @@ func (db *mysqlDB) getGuestsByRsvpId(id string) ([]*Guest, error) {
 	return guests, nil
 }
 
-const updateStatement = `UPDATE rsvp SET status=?, email=?, name=?, comments=? WHERE id = ? AND rsvp_id = ?`
+const updateStatement = `UPDATE rsvp SET rsvp_date=?, status=?, email=?, name=?, comments=? WHERE id = ? AND rsvp_id = ?`
 const updateGuestStatement = `UPDATE guests SET attending = ?, name = ?, comments = ? WHERE id = ? AND rsvp_id = ?`
 
 // UpdateRsvp updates the entry for a given Rsvp.
@@ -232,7 +236,12 @@ func (db *mysqlDB) UpdateRsvp(b *Rsvp) error {
 		return errors.New("mysql: Rsvp with unassigned RsvpID passed into updateRsvp")
 	}
 
-	_, err := execAffectingOneRow(db.update, b.Status, b.Email, b.Name, b.Comments, b.ID, b.RsvpID)
+	if b.RsvpDate == nil {
+		now := time.Now()
+		b.RsvpDate = &now
+	}
+
+	_, err := execAffectingOneRow(db.update, b.RsvpDate, b.Status, b.Email, b.Name, b.Comments, b.ID, b.RsvpID)
 
 	for _, guest := range b.Guests {
 		db.updateGuestByGuest(guest)

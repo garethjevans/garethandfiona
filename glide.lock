@@ -1,5 +1,5 @@
-hash: 283617adbefc6a1b25e43d59eff218f6692d36bc0ba158adc0cf4bced21aa75b
-updated: 2018-03-23T12:30:04.878551474Z
+hash: a34bf349964b9cb51d5e32976406d7fc7b3a7577f3b00c088cdf0e4e75ca2168
+updated: 2018-03-27T09:46:53.001610851Z
 imports:
 - name: github.com/go-sql-driver/mysql
   version: 1a676ac6e4dce68e9303a1800773861350374a9e
@@ -20,8 +20,6 @@ imports:
   - internal/logger
   - internal/sysinfo
   - internal/utilization
-- name: github.com/simplereach/timeutils
-  version: 1a719258b86a08630289b86902ab16817ba641e9
 - name: google.golang.org/appengine
   version: 5bee14b453b4c71be47ec1781b0fa61c2ea182db
   subpackages:

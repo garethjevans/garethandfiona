@@ -127,6 +127,10 @@ func TestCanUpdateRsvp(t *testing.T) {
 		t.Fatalf("Expecting rsvp with rsvp_id %s", "1")
 	}
 
+	if rsvp.RsvpDate != nil {
+		t.Fatalf("Expecting rsvp with nill rsvp_date but got %s", rsvp.RsvpDate)
+	}
+
 	if rsvp.Email != "bob1@bob.com" {
 		t.Fatalf("Expecting rsvp with email %s", "bob1@bob.com")
 	}
@@ -150,6 +154,10 @@ func TestCanUpdateRsvp(t *testing.T) {
 
 	if rsvp.RsvpID != "1" {
 		t.Fatalf("Expecting rsvp with rsvp_id %s", "1")
+	}
+
+	if rsvp.RsvpDate == nil {
+		t.Fatalf("Expecting rsvp with rsvp_date %s", rsvp.RsvpDate)
 	}
 
 	if rsvp.Email != "bober@bobest.com" {
