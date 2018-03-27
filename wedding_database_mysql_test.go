@@ -7,11 +7,11 @@ import (
 func TestLoadRsvpById(t *testing.T) {
 	batch := []string{
 		`DELETE FROM rsvp;`,
-		`INSERT INTO rsvp (rsvp_id, email, name, comments) VALUES ('1', 'bob1@bob.com','bob1','');`,
-		`INSERT INTO rsvp (rsvp_id, email, name, comments) VALUES ('2', 'bob2@bob.com','bob2','');`,
-		`INSERT INTO rsvp (rsvp_id, email, name, comments) VALUES ('3', 'bob3@bob.com','bob3','');`,
-		`INSERT INTO rsvp (rsvp_id, email, name, comments) VALUES ('4', 'bob4@bob.com','bob4','');`,
-		`INSERT INTO rsvp (rsvp_id, email, name, comments) VALUES ('5', 'bob5@bob.com','bob5','');`,
+		`INSERT INTO rsvp (rsvp_id, status, email, name, comments) VALUES ('1', '', 'bob1@bob.com','bob1','');`,
+		`INSERT INTO rsvp (rsvp_id, status, email, name, comments) VALUES ('2', '', 'bob2@bob.com','bob2','');`,
+		`INSERT INTO rsvp (rsvp_id, status, email, name, comments) VALUES ('3', '', 'bob3@bob.com','bob3','');`,
+		`INSERT INTO rsvp (rsvp_id, status, email, name, comments) VALUES ('4', '', 'bob4@bob.com','bob4','');`,
+		`INSERT INTO rsvp (rsvp_id, status, email, name, comments) VALUES ('5', '', 'bob5@bob.com','bob5','');`,
 		`DELETE FROM guests;`,
 		`INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('1',1,'bobs friend','');`,
 		`INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('3',1,'friend 1','');`,
@@ -94,7 +94,7 @@ func TestLoadRsvpById(t *testing.T) {
 func TestCanUpdateRsvp(t *testing.T) {
 	batch := []string{
 		`DELETE FROM rsvp;`,
-		`INSERT INTO rsvp (rsvp_id, email, name, comments) VALUES ('1', 'bob1@bob.com','bob1','');`,
+		`INSERT INTO rsvp (rsvp_id, status, email, name, comments) VALUES ('1', '', 'bob1@bob.com','bob1','');`,
 		`DELETE FROM guests;`,
 		`INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('1',1,'bobs friend','');`,
 	}
@@ -137,6 +137,7 @@ func TestCanUpdateRsvp(t *testing.T) {
 
 	rsvp.Name = "Bob Full Name"
 	rsvp.Email = "bober@bobest.com"
+	rsvp.Status = "attending"
 
 	rsvp.Guests[0].Attending = false
 

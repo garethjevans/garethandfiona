@@ -92,7 +92,7 @@ func TestCanUpdateRsvpViaWeb(t *testing.T) {
 	}
 
 	// post update
-	postBody := `Name=bobnew&Email=bobnew@bob.com&Guests.0.Name=belinda&Guests.0.Comments=Loves Eggs&Guests.0.Attending=false`
+	postBody := `Status=attending&Name=bobnew&Email=bobnew@bob.com&Guests.0.Name=belinda&Guests.0.Comments=Loves Eggs&Guests.0.Attending=false`
 	postBodyReader := strings.NewReader(postBody)
 
 	// follow redirect
@@ -140,11 +140,11 @@ func TestCanUpdateRsvpViaWeb(t *testing.T) {
 func clearTestData(t *testing.T) {
 	batch := []string{
 		`DELETE FROM rsvp;`,
-		`INSERT INTO rsvp (rsvp_id, email, name, comments) VALUES ('1', 'bob1@bob.com','bob1','');`,
-		`INSERT INTO rsvp (rsvp_id, email, name, comments) VALUES ('2', 'bob2@bob.com','bob2','');`,
-		`INSERT INTO rsvp (rsvp_id, email, name, comments) VALUES ('3', 'bob3@bob.com','bob3','');`,
-		`INSERT INTO rsvp (rsvp_id, email, name, comments) VALUES ('4', 'bob4@bob.com','bob4','');`,
-		`INSERT INTO rsvp (rsvp_id, email, name, comments) VALUES ('5', 'bob5@bob.com','bob5','');`,
+		`INSERT INTO rsvp (rsvp_id, status, email, name, comments) VALUES ('1', '', 'bob1@bob.com','bob1','');`,
+		`INSERT INTO rsvp (rsvp_id, status, email, name, comments) VALUES ('2', '', 'bob2@bob.com','bob2','');`,
+		`INSERT INTO rsvp (rsvp_id, status, email, name, comments) VALUES ('3', '', 'bob3@bob.com','bob3','');`,
+		`INSERT INTO rsvp (rsvp_id, status, email, name, comments) VALUES ('4', '', 'bob4@bob.com','bob4','');`,
+		`INSERT INTO rsvp (rsvp_id, status, email, name, comments) VALUES ('5', '', 'bob5@bob.com','bob5','');`,
 		`DELETE FROM guests;`,
 		`INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('1',1,'bobs friend','');`,
 		`INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('3',1,'friend 1','');`,

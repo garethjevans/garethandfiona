@@ -1,6 +1,8 @@
 # Todo List
 
-  * Wrap all calls in newrelic handler functions
-  * Remove data when creating wedding_database_mysql_test
+  * wedding_database_mysql_test needs to use transactions
+  * visual thing when attending
+  * bad database connections?
+  * ensure both submit buttons work
 
 

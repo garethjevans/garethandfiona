@@ -41,7 +41,8 @@ func (a *App) Initialize(dbUser string, dbPassword string, newRelicAppName strin
 }
 
 func (a *App) Run(addr string) {
-	log.Fatal(http.ListenAndServe(":8080", a.Router))
+	log.Printf("Starting... on %s", addr)
+	log.Fatal(http.ListenAndServe(addr, a.Router))
 }
 
 //func respondWithError(w http.ResponseWriter, code int, message string) {

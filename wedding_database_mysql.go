@@ -16,6 +16,7 @@ var createTableStatements = []string{
 		id        INT UNSIGNED NOT NULL AUTO_INCREMENT, 
 		rsvp_id   CHAR(36) NOT NULL,
 		rsvp_date DATETIME NULL,
+		status    VARCHAR(255) NOT NULL,
 		email     VARCHAR(255) NOT NULL,
 		name      VARCHAR(255) NOT NULL,
 		comments  VARCHAR(255) NOT NULL,
@@ -124,18 +125,20 @@ func scanRsvp(s rowScanner) (*Rsvp, error) {
 	var (
 		id       int64
 		rsvp_id  sql.NullString
+		status   sql.NullString
 		email    sql.NullString
 		name     sql.NullString
 		comments sql.NullString
 	)
 
-	if err := s.Scan(&id, &rsvp_id, &email, &name, &comments); err != nil {
+	if err := s.Scan(&id, &rsvp_id, &status, &email, &name, &comments); err != nil {
 		return nil, err
 	}
 
 	Rsvp := &Rsvp{
 		ID:       id,
 		RsvpID:   rsvp_id.String,
+		Status:   status.String,
 		Email:    email.String,
 		Name:     name.String,
 		Comments: comments.String,
@@ -166,7 +169,7 @@ func scanGuest(s rowScanner) (*Guest, error) {
 	return Guest, nil
 }
 
-const getStatement = `SELECT id,rsvp_id,email,name,comments FROM rsvp WHERE rsvp_id = ?`
+const getStatement = `SELECT id,rsvp_id,status,email,name,comments FROM rsvp WHERE rsvp_id = ?`
 const getGuestsStatement = `SELECT id,rsvp_id,name,attending,comments FROM guests WHERE rsvp_id = ?`
 
 // GetRsvp retrieves a Rsvp by its ID.
@@ -215,7 +218,7 @@ func (db *mysqlDB) getGuestsByRsvpId(id string) ([]*Guest, error) {
 	return guests, nil
 }
 
-const updateStatement = `UPDATE rsvp SET email=?, name=?, comments=? WHERE id = ? AND rsvp_id = ?`
+const updateStatement = `UPDATE rsvp SET status=?, email=?, name=?, comments=? WHERE id = ? AND rsvp_id = ?`
 const updateGuestStatement = `UPDATE guests SET attending = ?, name = ?, comments = ? WHERE id = ? AND rsvp_id = ?`
 
 // UpdateRsvp updates the entry for a given Rsvp.
@@ -229,7 +232,7 @@ func (db *mysqlDB) UpdateRsvp(b *Rsvp) error {
 		return errors.New("mysql: Rsvp with unassigned RsvpID passed into updateRsvp")
 	}
 
-	_, err := execAffectingOneRow(db.update, b.Email, b.Name, b.Comments, b.ID, b.RsvpID)
+	_, err := execAffectingOneRow(db.update, b.Status, b.Email, b.Name, b.Comments, b.ID, b.RsvpID)
 
 	for _, guest := range b.Guests {
 		db.updateGuestByGuest(guest)
