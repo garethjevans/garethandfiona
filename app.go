@@ -8,6 +8,7 @@ import (
 	"github.com/magiconair/properties"
 	"github.com/newrelic/go-agent"
 	"html/template"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -126,6 +127,7 @@ func (a *App) ShowRsvpRest(w http.ResponseWriter, r *http.Request) {
 
 	respondWithJSON(w, http.StatusOK, item)
 }
+
 func (a *App) SaveRsvp(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	log.Printf("SaveRsvp(%s)", params["id"])
@@ -162,6 +164,43 @@ func (a *App) SaveRsvp(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, target, http.StatusSeeOther)
 }
 
+func (a *App) SaveRsvpRest(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	id := params["id"]
+	log.Printf("SaveRsvpRest(%s)", id)
+
+	item, err := a.DB.GetRsvp(id)
+	log.Printf("Got Rsvp from DB\n%s", item)
+
+	if err != nil {
+		log.Print("Invalid reference: ", err)
+		respondWithError(w, http.StatusNotFound, fmt.Sprintf("Invalid reference %s", id))
+		return
+	}
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Print("Unable to decode rsvp:", err)
+		respondWithError(w, http.StatusNotFound, fmt.Sprintf("unable to decode rsvp: %s", err))
+		return
+	}
+
+	err = json.Unmarshal(body, item)
+	log.Printf("Got Rsvp after setting values from request\n%s", item)
+
+	if err != nil {
+		log.Print("Unable to decode rsvp:", err)
+		respondWithError(w, http.StatusNotFound, fmt.Sprintf("unable to decode rsvp: %s", err))
+		return
+	}
+
+	a.DB.UpdateRsvp(item)
+
+	target := "http://" + r.Host + "/api/rsvp/" + item.RsvpID
+	log.Print("Sending Redirect: " + target)
+	http.Redirect(w, r, target, http.StatusSeeOther)
+}
+
 func (a *App) initializeRoutes(nr newrelic.Application) {
 	a.Router.HandleFunc(newrelic.WrapHandleFunc(nr, "/", a.handler))
 	a.Router.HandleFunc(newrelic.WrapHandleFunc(nr, "/ping", a.handler))
@@ -172,8 +211,7 @@ func (a *App) initializeRoutes(nr newrelic.Application) {
 
 	// api calls
 	a.Router.HandleFunc(newrelic.WrapHandleFunc(nr, "/api/rsvp/{id}", a.ShowRsvpRest)).Methods("GET")
-	//r.HandleFunc(newrelic.WrapHandleFunc(app,"/api/rsvp/{id}", GetRsvp)).Methods("GET")
-	//r.HandleFunc(newrelic.WrapHandleFunc(app,"/api/rsvp/{id}", CreateRsvp)).Methods("POST")
+	a.Router.HandleFunc(newrelic.WrapHandleFunc(nr, "/api/rsvp/{id}", a.SaveRsvpRest)).Methods("POST")
 
 	// static calls
 	a.Router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))

@@ -8,7 +8,7 @@ import (
 type Rsvp struct {
 	ID       int64      `json:"-" schema:"-"`
 	RsvpID   string     `json:"-" schema:"-"`
-	RsvpDate *time.Time `json:"rsvp_time,omitempty" schema:"-"`
+	RsvpDate *time.Time `json:"-" schema:"-"`
 	Status   string     `json:"status,omitempty"`
 	Email    string     `json:"email,omitempty"`
 	Name     string     `json:"name,omitempty"`
