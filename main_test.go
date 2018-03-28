@@ -33,7 +33,7 @@ func TestApp(t *testing.T) {
 	t.Run("canUpdateRsvpViaWeb", canUpdateRsvpViaWeb)
 
 	t.Run("showRsvpViaRest", showRsvpViaRest)
-	t.Run("showMissingRsvpViaRest", showRsvpViaRest)
+	t.Run("showMissingRsvpViaRest", showMissingRsvpViaRest)
 	//t.Run("canUpdateRsvpViaRest", canUpdateRsvpViaRest)
 
 	// <tear-down code>
@@ -159,6 +159,10 @@ func showMissingRsvpViaRest(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/api/rsvp/missing", nil)
 	response := executeRequest(req)
 	checkResponseCode(t, http.StatusNotFound, response.Code)
+
+	if body := response.Body.String(); !strings.Contains(body, `{"error":"Unable to find 'missing'"}`) {
+		t.Errorf("Expected a correct json body. Got %s", body)
+	}
 }
 
 func clearTestData(t *testing.T, a App) {

@@ -120,7 +120,7 @@ func (a *App) ShowRsvpRest(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Print("Invalid reference: ", err)
-		respondWithError(w, http.StatusNotFound, fmt.Sprintf("Unable to find %s", params["id"]))
+		respondWithError(w, http.StatusNotFound, fmt.Sprintf("Unable to find '%s'", params["id"]))
 		return
 	}
 
