@@ -35,6 +35,7 @@ func TestApp(t *testing.T) {
 	t.Run("showRsvpViaRest", showRsvpViaRest)
 	t.Run("showMissingRsvpViaRest", showMissingRsvpViaRest)
 	t.Run("canUpdateRsvpViaRest", canUpdateRsvpViaRest)
+	t.Run("canUpdateRsvpViaRestWithInvalidStatus", canUpdateRsvpViaRestWithInvalidStatus)
 
 	// <tear-down code>
 	log.Printf("Rolling Back Transaction")
@@ -200,6 +201,35 @@ func canUpdateRsvpViaRest(t *testing.T) {
 	body = response.Body.String()
 
 	if body != `{"status":"attending","email":"bob1@bob.com","name":"bob1","guests":[{"name":"bobs friend","attending":true}]}` {
+		t.Errorf("Expected a correct json body. Got %s", body)
+	}
+}
+
+func canUpdateRsvpViaRestWithInvalidStatus(t *testing.T) {
+	clearTestData(t, a)
+	req, _ := http.NewRequest("GET", "/api/rsvp/1", nil)
+	response := executeRequest(req)
+	checkResponseCode(t, http.StatusOK, response.Code)
+
+	body := response.Body.String()
+
+	if body != `{"email":"bob1@bob.com","name":"bob1","guests":[{"name":"bobs friend","attending":true}]}` {
+		t.Errorf("Expected a correct json body. Got %s", body)
+	}
+
+	// post update
+	postBody := `{"status":"someithing else"}`
+	postBodyReader := strings.NewReader(postBody)
+
+	// follow redirect
+	req, _ = http.NewRequest("POST", "/api/rsvp/1", postBodyReader)
+	req.Header.Set("Content-Type", "application/json")
+	response = executeRequest(req)
+
+	checkResponseCode(t, http.StatusBadRequest, response.Code)
+
+	body = response.Body.String()
+	if body != `{"error":"Status must be 'attending' or 'notattending'"}` {
 		t.Errorf("Expected a correct json body. Got %s", body)
 	}
 }

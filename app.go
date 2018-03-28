@@ -194,6 +194,11 @@ func (a *App) SaveRsvpRest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if item.Status != "attending" && item.Status != "notattending" && item.Status != "" {
+		respondWithError(w, http.StatusBadRequest, fmt.Sprintf("Status must be 'attending' or 'notattending'"))
+		return
+	}
+
 	a.DB.UpdateRsvp(item)
 
 	target := "http://" + r.Host + "/api/rsvp/" + item.RsvpID
