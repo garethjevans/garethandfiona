@@ -6,8 +6,8 @@ import (
 )
 
 type Rsvp struct {
-	ID       int64      `json:"id,omitempty" schema:"-"`
-	RsvpID   string     `json:"rsvp_id,omitempty" schema:"-"`
+	ID       int64      `json:"-" schema:"-"`
+	RsvpID   string     `json:"-" schema:"-"`
 	RsvpDate *time.Time `json:"rsvp_time,omitempty" schema:"-"`
 	Status   string     `json:"status,omitempty"`
 	Email    string     `json:"email,omitempty"`
@@ -17,8 +17,8 @@ type Rsvp struct {
 }
 
 type Guest struct {
-	ID        int64  `json:"id,omitempty" schema:"-"`
-	RsvpID    string `json:"rsvp_id,omitempty" schema:"-"`
+	ID        int64  `json:"-" schema:"-"`
+	RsvpID    string `json:"-" schema:"-"`
 	Name      string `json:"name,omitempty"`
 	Attending bool   `json:"attending,omitempty"`
 	Comments  string `json:"comments,omitempty"`

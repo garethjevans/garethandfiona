@@ -32,6 +32,10 @@ func TestApp(t *testing.T) {
 	t.Run("showRsvpViaWeb", showRsvpViaWeb)
 	t.Run("canUpdateRsvpViaWeb", canUpdateRsvpViaWeb)
 
+	t.Run("showRsvpViaRest", showRsvpViaRest)
+	t.Run("showMissingRsvpViaRest", showRsvpViaRest)
+	//t.Run("canUpdateRsvpViaRest", canUpdateRsvpViaRest)
+
 	// <tear-down code>
 	log.Printf("Rolling Back Transaction")
 	tx.Rollback()
@@ -137,6 +141,24 @@ func canUpdateRsvpViaWeb(t *testing.T) {
 	if !strings.Contains(body, `<input type="radio" class="form-control" name="Guests.0.Attending" value="false" checked>`) {
 		t.Errorf("Expected a correct guest 1 attending. Got %s", body)
 	}
+}
+
+func showRsvpViaRest(t *testing.T) {
+	clearTestData(t, a)
+	req, _ := http.NewRequest("GET", "/api/rsvp/1", nil)
+	response := executeRequest(req)
+	checkResponseCode(t, http.StatusOK, response.Code)
+
+	if body := response.Body.String(); !strings.Contains(body, `{"email":"bob1@bob.com","name":"bob1","guests":[{"name":"bobs friend","attending":true}]}`) {
+		t.Errorf("Expected a correct json body. Got %s", body)
+	}
+}
+
+func showMissingRsvpViaRest(t *testing.T) {
+	clearTestData(t, a)
+	req, _ := http.NewRequest("GET", "/api/rsvp/missing", nil)
+	response := executeRequest(req)
+	checkResponseCode(t, http.StatusNotFound, response.Code)
 }
 
 func clearTestData(t *testing.T, a App) {

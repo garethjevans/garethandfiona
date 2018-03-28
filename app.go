@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/schema"
@@ -45,16 +46,16 @@ func (a *App) Run(addr string) {
 	log.Fatal(http.ListenAndServe(addr, a.Router))
 }
 
-//func respondWithError(w http.ResponseWriter, code int, message string) {
-//  respondWithJSON(w, code, map[string]string{"error": message})
-//}
+func respondWithError(w http.ResponseWriter, code int, message string) {
+	respondWithJSON(w, code, map[string]string{"error": message})
+}
 
-//func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
-//  response, _ := json.Marshal(payload)
-//  w.Header().Set("Content-Type", "application/json")
-//  w.WriteHeader(code)
-//  w.Write(response)
-//}
+func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
+	response, _ := json.Marshal(payload)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	w.Write(response)
+}
 
 func (a *App) getProperties() map[string]string {
 	var p map[string]string
@@ -91,12 +92,8 @@ type Page struct {
 }
 
 func (a *App) ShowRsvp(w http.ResponseWriter, r *http.Request) {
-	a.showRsvpBase(w, r, "show_rsvp2")
-}
-
-func (a *App) showRsvpBase(w http.ResponseWriter, r *http.Request, v string) {
 	params := mux.Vars(r)
-	log.Printf("showRsvpBase(%s)", params["id"])
+	log.Printf("ShowRsvp(%s)", params["id"])
 
 	item, err := a.DB.GetRsvp(params["id"])
 
@@ -106,7 +103,7 @@ func (a *App) showRsvpBase(w http.ResponseWriter, r *http.Request, v string) {
 		return
 	}
 
-	t, _ := template.ParseFiles(fmt.Sprintf("templates/%s.tmpl", v))
+	t, _ := template.ParseFiles(fmt.Sprintf("templates/%s.tmpl", "show_rsvp2"))
 	err2 := t.Execute(w, Page{Rsvp: item, P: a.getProperties()})
 	if err2 != nil {
 		log.Print("Unable to parse template: ", err2)
@@ -115,6 +112,20 @@ func (a *App) showRsvpBase(w http.ResponseWriter, r *http.Request, v string) {
 	}
 }
 
+func (a *App) ShowRsvpRest(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	log.Printf("ShowRsvp(%s)", params["id"])
+
+	item, err := a.DB.GetRsvp(params["id"])
+
+	if err != nil {
+		log.Print("Invalid reference: ", err)
+		respondWithError(w, http.StatusNotFound, fmt.Sprintf("Unable to find %s", params["id"]))
+		return
+	}
+
+	respondWithJSON(w, http.StatusOK, item)
+}
 func (a *App) SaveRsvp(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	log.Printf("SaveRsvp(%s)", params["id"])
@@ -160,7 +171,7 @@ func (a *App) initializeRoutes(nr newrelic.Application) {
 	a.Router.HandleFunc(newrelic.WrapHandleFunc(nr, "/rsvp/{id}/save", a.SaveRsvp)).Methods("POST")
 
 	// api calls
-	//r.HandleFunc(newrelic.WrapHandleFunc(app,"/api/rsvp", ListRsvp)).Methods("GET")
+	a.Router.HandleFunc(newrelic.WrapHandleFunc(nr, "/api/rsvp/{id}", a.ShowRsvpRest)).Methods("GET")
 	//r.HandleFunc(newrelic.WrapHandleFunc(app,"/api/rsvp/{id}", GetRsvp)).Methods("GET")
 	//r.HandleFunc(newrelic.WrapHandleFunc(app,"/api/rsvp/{id}", CreateRsvp)).Methods("POST")
 
