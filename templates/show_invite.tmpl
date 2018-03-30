@@ -35,12 +35,9 @@
                 <div class="card-body">
                   <form method="get" action="/rsvp/{{ .Rsvp.RsvpID }}">
                     <div class="form-row">
-                      <div class="form-group col-md-6">
-{{if .Rsvp.Guests}}
-{{range $index, $person := .Rsvp.Guests}}
-                        {{ $person.Name }}
-{{end}}
-{{end}}
+                      <div class="form-group col-md-12">
+                        <p>Dear {{ .Rsvp.WelcomeMessage }},</p>
+						<p>We're getting married on the 27th of August 2018 and we'd love it if you could join us to celebrate</p>
                       </div>
                     </div>
                     <button type="submit" class="btn btn-primary">RSVP Now</button>
