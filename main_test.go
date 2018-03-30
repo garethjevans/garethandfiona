@@ -30,6 +30,7 @@ func TestApp(t *testing.T) {
 
 	t.Run("homePageViaWeb", homePageViaWeb)
 	t.Run("showRsvpViaWeb", showRsvpViaWeb)
+	t.Run("showInviteViaWeb", showInviteViaWeb)
 	t.Run("canUpdateRsvpViaWeb", canUpdateRsvpViaWeb)
 
 	t.Run("showRsvpViaRest", showRsvpViaRest)
@@ -60,6 +61,17 @@ func showRsvpViaWeb(t *testing.T) {
 	checkResponseCode(t, http.StatusOK, response.Code)
 
 	if body := response.Body.String(); !strings.Contains(body, `<form method="post" action="/rsvp/1/save">`) {
+		t.Errorf("Expected a correct form. Got %s", body)
+	}
+}
+
+func showInviteViaWeb(t *testing.T) {
+	clearTestData(t, a)
+	req, _ := http.NewRequest("GET", "/invite/1", nil)
+	response := executeRequest(req)
+	checkResponseCode(t, http.StatusOK, response.Code)
+
+	if body := response.Body.String(); !strings.Contains(body, `<form method="get" action="/rsvp/1">`) {
 		t.Errorf("Expected a correct form. Got %s", body)
 	}
 }
