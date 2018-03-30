@@ -9,10 +9,7 @@ type Rsvp struct {
 	ID       int64      `json:"-" schema:"-"`
 	RsvpID   string     `json:"-" schema:"-"`
 	RsvpDate *time.Time `json:"-" schema:"-"`
-	Status   string     `json:"status,omitempty"`
 	Email    string     `json:"email,omitempty"`
-	Name     string     `json:"name,omitempty"`
-	Comments string     `json:"comments,omitempty"`
 	Guests   []*Guest   `json:"guests,omitempty"`
 }
 
@@ -25,7 +22,7 @@ type Guest struct {
 }
 
 func (r *Rsvp) String() string {
-	return fmt.Sprintf("Rsvp(ID:%d, RsvpID:%s, Date:%s, Name:%s, Email:%s, Status:%s, Comments:%s, Guests:%s)", r.ID, r.RsvpID, r.RsvpDate, r.Name, r.Email, r.Status, r.Comments, r.Guests)
+	return fmt.Sprintf("Rsvp(ID:%d, RsvpID:%s, Date:%s, Email:%s, Guests:%s)", r.ID, r.RsvpID, r.RsvpDate, r.Email, r.Guests)
 }
 
 func (g *Guest) String() string {

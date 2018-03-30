@@ -17,10 +17,7 @@ var createTableStatements = []string{
 		id        INT UNSIGNED NOT NULL AUTO_INCREMENT, 
 		rsvp_id   CHAR(36) NOT NULL,
 		rsvp_date DATETIME NULL,
-		status    VARCHAR(255) NOT NULL,
 		email     VARCHAR(255) NOT NULL,
-		name      VARCHAR(255) NOT NULL,
-		comments  VARCHAR(255) NOT NULL,
 		PRIMARY KEY (id)
 	)`,
 	`CREATE TABLE IF NOT EXISTS guests (
@@ -122,25 +119,19 @@ func scanRsvp(s rowScanner) (*Rsvp, error) {
 		id        int64
 		rsvp_id   sql.NullString
 		rsvp_date mysql.NullTime
-		status    sql.NullString
 		email     sql.NullString
-		name      sql.NullString
-		comments  sql.NullString
 	)
 
-	if err := s.Scan(&id, &rsvp_id, &rsvp_date, &status, &email, &name, &comments); err != nil {
+	if err := s.Scan(&id, &rsvp_id, &rsvp_date, &email); err != nil {
 		return nil, err
 	}
 
 	log.Printf("Date is valid - %t", rsvp_date.Valid)
 
 	Rsvp := &Rsvp{
-		ID:       id,
-		RsvpID:   rsvp_id.String,
-		Status:   status.String,
-		Email:    email.String,
-		Name:     name.String,
-		Comments: comments.String,
+		ID:     id,
+		RsvpID: rsvp_id.String,
+		Email:  email.String,
 	}
 
 	if rsvp_date.Valid {
@@ -173,7 +164,7 @@ func scanGuest(s rowScanner) (*Guest, error) {
 	return Guest, nil
 }
 
-const getStatement = `SELECT id,rsvp_id,rsvp_date,status,email,name,comments FROM rsvp WHERE rsvp_id = ?`
+const getStatement = `SELECT id,rsvp_id,rsvp_date,email FROM rsvp WHERE rsvp_id = ?`
 const getGuestsStatement = `SELECT id,rsvp_id,name,attending,comments FROM guests WHERE rsvp_id = ?`
 
 // GetRsvp retrieves a Rsvp by its ID.
@@ -222,7 +213,7 @@ func (db *mysqlDB) getGuestsByRsvpId(id string) ([]*Guest, error) {
 	return guests, nil
 }
 
-const updateStatement = `UPDATE rsvp SET rsvp_date=?, status=?, email=?, name=?, comments=? WHERE id = ? AND rsvp_id = ?`
+const updateStatement = `UPDATE rsvp SET rsvp_date=?, email=? WHERE id = ? AND rsvp_id = ?`
 const updateGuestStatement = `UPDATE guests SET attending = ?, name = ?, comments = ? WHERE id = ? AND rsvp_id = ?`
 
 // UpdateRsvp updates the entry for a given Rsvp.
@@ -241,7 +232,7 @@ func (db *mysqlDB) UpdateRsvp(b *Rsvp) error {
 		b.RsvpDate = &now
 	}
 
-	_, err := execAffectingOneRow(db.update, b.RsvpDate, b.Status, b.Email, b.Name, b.Comments, b.ID, b.RsvpID)
+	_, err := execAffectingOneRow(db.update, b.RsvpDate, b.Email, b.ID, b.RsvpID)
 
 	for _, guest := range b.Guests {
 		db.updateGuestByGuest(guest)

@@ -104,7 +104,28 @@ func (a *App) ShowRsvp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	t, _ := template.ParseFiles(fmt.Sprintf("templates/%s.tmpl", "show_rsvp2"))
+	t, _ := template.ParseFiles(fmt.Sprintf("templates/%s.tmpl", "show_rsvp"))
+	err2 := t.Execute(w, Page{Rsvp: item, P: a.getProperties()})
+	if err2 != nil {
+		log.Print("Unable to parse template: ", err2)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func (a *App) ShowInvite(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	log.Printf("ShowInvite(%s)", params["id"])
+
+	item, err := a.DB.GetRsvp(params["id"])
+
+	if err != nil {
+		log.Print("Invalid reference: ", err)
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
+	t, _ := template.ParseFiles(fmt.Sprintf("templates/%s.tmpl", "show_invite"))
 	err2 := t.Execute(w, Page{Rsvp: item, P: a.getProperties()})
 	if err2 != nil {
 		log.Print("Unable to parse template: ", err2)
@@ -194,11 +215,6 @@ func (a *App) SaveRsvpRest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if item.Status != "attending" && item.Status != "notattending" && item.Status != "" {
-		respondWithError(w, http.StatusBadRequest, fmt.Sprintf("Status must be 'attending' or 'notattending'"))
-		return
-	}
-
 	a.DB.UpdateRsvp(item)
 
 	target := "http://" + r.Host + "/api/rsvp/" + item.RsvpID
@@ -209,8 +225,10 @@ func (a *App) SaveRsvpRest(w http.ResponseWriter, r *http.Request) {
 func (a *App) initializeRoutes(nr newrelic.Application) {
 	a.Router.HandleFunc(newrelic.WrapHandleFunc(nr, "/", a.handler))
 	a.Router.HandleFunc(newrelic.WrapHandleFunc(nr, "/ping", a.handler))
+	a.Router.HandleFunc(newrelic.WrapHandleFunc(nr, "/api", a.handler))
 
 	// web calls
+	a.Router.HandleFunc(newrelic.WrapHandleFunc(nr, "/invite/{id}", a.ShowInvite)).Methods("GET")
 	a.Router.HandleFunc(newrelic.WrapHandleFunc(nr, "/rsvp/{id}", a.ShowRsvp)).Methods("GET")
 	a.Router.HandleFunc(newrelic.WrapHandleFunc(nr, "/rsvp/{id}/save", a.SaveRsvp)).Methods("POST")
 

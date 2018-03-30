@@ -49,8 +49,8 @@ func loadRsvpById(t *testing.T) {
 		t.Fatalf("Expecting rsvp with email %s", "bob1@bob.com")
 	}
 
-	if len(rsvp.Guests) != 1 {
-		t.Fatalf("Expecting rsvp with 1 guest")
+	if len(rsvp.Guests) != 2 {
+		t.Fatalf("Expecting rsvp with 2 guest")
 	}
 
 	// bob2
@@ -67,8 +67,8 @@ func loadRsvpById(t *testing.T) {
 		t.Fatalf("Expecting rsvp with email %s", "bob2@bob.com")
 	}
 
-	if len(rsvp.Guests) != 0 {
-		t.Fatalf("Expecting rsvp with 0 guest")
+	if len(rsvp.Guests) != 1 {
+		t.Fatalf("Expecting rsvp with 1 guest")
 	}
 
 	// bob3
@@ -85,8 +85,8 @@ func loadRsvpById(t *testing.T) {
 		t.Fatalf("Expecting rsvp with email %s", "bob3@bob.com")
 	}
 
-	if len(rsvp.Guests) != 2 {
-		t.Fatalf("Expecting rsvp with 2 guests")
+	if len(rsvp.Guests) != 3 {
+		t.Fatalf("Expecting rsvp with 3 guests")
 	}
 }
 
@@ -111,14 +111,11 @@ func canUpdateRsvp(t *testing.T) {
 		t.Fatalf("Expecting rsvp with email %s", "bob1@bob.com")
 	}
 
-	if len(rsvp.Guests) != 1 {
-		t.Fatalf("Expecting rsvp with 1 guest")
+	if len(rsvp.Guests) != 2 {
+		t.Fatalf("Expecting rsvp with 2 guest")
 	}
 
-	rsvp.Name = "Bob Full Name"
 	rsvp.Email = "bober@bobest.com"
-	rsvp.Status = "attending"
-
 	rsvp.Guests[0].Attending = false
 
 	b.DB.UpdateRsvp(rsvp)
@@ -140,27 +137,32 @@ func canUpdateRsvp(t *testing.T) {
 		t.Fatalf("Expecting rsvp with email %s", "bober@bobest.com")
 	}
 
-	if len(rsvp.Guests) != 1 {
-		t.Fatalf("Expecting rsvp with 1 guest")
+	if len(rsvp.Guests) != 2 {
+		t.Fatalf("Expecting rsvp with 2 guest")
 	}
 
 	if rsvp.Guests[0].Attending {
-		t.Fatalf("Guest 1 is not supposed to be attending")
+		t.Fatalf("Guest 0 is not supposed to be attending")
 	}
 }
 
 func clearTestDataForDatabase(t *testing.T, a App) {
 	batch := []string{
 		`DELETE FROM rsvp;`,
-		`INSERT INTO rsvp (rsvp_id, status, email, name, comments) VALUES ('1', '', 'bob1@bob.com','bob1','');`,
-		`INSERT INTO rsvp (rsvp_id, status, email, name, comments) VALUES ('2', '', 'bob2@bob.com','bob2','');`,
-		`INSERT INTO rsvp (rsvp_id, status, email, name, comments) VALUES ('3', '', 'bob3@bob.com','bob3','');`,
-		`INSERT INTO rsvp (rsvp_id, status, email, name, comments) VALUES ('4', '', 'bob4@bob.com','bob4','');`,
-		`INSERT INTO rsvp (rsvp_id, status, email, name, comments) VALUES ('5', '', 'bob5@bob.com','bob5','');`,
+		`INSERT INTO rsvp (rsvp_id, email) VALUES ('1', 'bob1@bob.com');`,
+		`INSERT INTO rsvp (rsvp_id, email) VALUES ('2', 'bob2@bob.com');`,
+		`INSERT INTO rsvp (rsvp_id, email) VALUES ('3', 'bob3@bob.com');`,
+		`INSERT INTO rsvp (rsvp_id, email) VALUES ('4', 'bob4@bob.com');`,
+		`INSERT INTO rsvp (rsvp_id, email) VALUES ('5', 'bob5@bob.com');`,
 		`DELETE FROM guests;`,
+		`INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('1',1,'bob1','');`,
 		`INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('1',1,'bobs friend','');`,
+		`INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('2',1,'bob2','');`,
+		`INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('3',1,'bob3','');`,
 		`INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('3',1,'friend 1','');`,
 		`INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('3',0,'friend 2','');`,
+		`INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('4',1,'bob4','');`,
+		`INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('5',1,'bob5','');`,
 	}
 
 	for _, b := range batch {

@@ -35,7 +35,6 @@ func TestApp(t *testing.T) {
 	t.Run("showRsvpViaRest", showRsvpViaRest)
 	t.Run("showMissingRsvpViaRest", showMissingRsvpViaRest)
 	t.Run("canUpdateRsvpViaRest", canUpdateRsvpViaRest)
-	t.Run("canUpdateRsvpViaRestWithInvalidStatus", canUpdateRsvpViaRestWithInvalidStatus)
 
 	// <tear-down code>
 	log.Printf("Rolling Back Transaction")
@@ -79,13 +78,7 @@ func canUpdateRsvpViaWeb(t *testing.T) {
 	if !strings.Contains(body, `<form method="post" action="/rsvp/1/save">`) {
 		t.Errorf("Expected a correct form. Got %s", body)
 	}
-	if !strings.Contains(body, `<input type="email" class="form-control" name="Email" placeholder="Email" value="bob1@bob.com">`) {
-		t.Errorf("Expected a correct email field. Got %s", body)
-	}
-	if !strings.Contains(body, `<input type="text" class="form-control" name="Name" placeholder="Name" value="bob1">`) {
-		t.Errorf("Expected a correct name field. Got %s", body)
-	}
-	if !strings.Contains(body, `<input type="text" class="form-control" name="Guests.0.Name" value="bobs friend">`) {
+	if !strings.Contains(body, `<input type="text" class="form-control" name="Guests.0.Name" value="bob1">`) {
 		t.Errorf("Expected a correct guest 1 name. Got %s", body)
 	}
 	if !strings.Contains(body, `<input type="text" class="form-control" name="Guests.0.Comments" value="">`) {
@@ -99,7 +92,7 @@ func canUpdateRsvpViaWeb(t *testing.T) {
 	}
 
 	// post update
-	postBody := `Status=attending&Name=bobnew&Email=bobnew@bob.com&Guests.0.Name=belinda&Guests.0.Comments=Loves Eggs&Guests.0.Attending=false`
+	postBody := `Guests.0.Name=bobnew&Guests.1.Name=belinda&Guests.1.Comments=Loves Eggs&Guests.1.Attending=false`
 	postBodyReader := strings.NewReader(postBody)
 
 	// follow redirect
@@ -123,23 +116,20 @@ func canUpdateRsvpViaWeb(t *testing.T) {
 	if !strings.Contains(body, `<form method="post" action="/rsvp/1/save">`) {
 		t.Errorf("Expected a correct form. Got %s", body)
 	}
-	if !strings.Contains(body, `<input type="email" class="form-control" name="Email" placeholder="Email" value="bobnew@bob.com">`) {
-		t.Errorf("Expected a correct email field. Got %s", body)
-	}
-	if !strings.Contains(body, `<input type="text" class="form-control" name="Name" placeholder="Name" value="bobnew">`) {
+	if !strings.Contains(body, `<input type="text" class="form-control" name="Guests.0.Name" value="bobnew">`) {
 		t.Errorf("Expected a correct name field. Got %s", body)
 	}
 
-	if !strings.Contains(body, `<input type="text" class="form-control" name="Guests.0.Name" value="belinda">`) {
+	if !strings.Contains(body, `<input type="text" class="form-control" name="Guests.1.Name" value="belinda">`) {
 		t.Errorf("Expected a correct guest 1 name. Got %s", body)
 	}
-	if !strings.Contains(body, `<input type="text" class="form-control" name="Guests.0.Comments" value="Loves Eggs">`) {
+	if !strings.Contains(body, `<input type="text" class="form-control" name="Guests.1.Comments" value="Loves Eggs">`) {
 		t.Errorf("Expected a correct guest 1 comments. Got %s", body)
 	}
-	if !strings.Contains(body, `<input type="radio" class="form-control" name="Guests.0.Attending" value="true">`) {
+	if !strings.Contains(body, `<input type="radio" class="form-control" name="Guests.1.Attending" value="true">`) {
 		t.Errorf("Expected a correct guest 1 attending. Got %s", body)
 	}
-	if !strings.Contains(body, `<input type="radio" class="form-control" name="Guests.0.Attending" value="false" checked>`) {
+	if !strings.Contains(body, `<input type="radio" class="form-control" name="Guests.1.Attending" value="false" checked>`) {
 		t.Errorf("Expected a correct guest 1 attending. Got %s", body)
 	}
 }
@@ -151,7 +141,7 @@ func showRsvpViaRest(t *testing.T) {
 	checkResponseCode(t, http.StatusOK, response.Code)
 
 	body := response.Body.String()
-	if body != `{"email":"bob1@bob.com","name":"bob1","guests":[{"name":"bobs friend","attending":true}]}` {
+	if body != `{"email":"bob1@bob.com","guests":[{"name":"bob1","attending":true},{"name":"bobs friend","attending":true}]}` {
 		t.Errorf("Expected a correct json body. Got %s", body)
 	}
 }
@@ -176,76 +166,52 @@ func canUpdateRsvpViaRest(t *testing.T) {
 
 	body := response.Body.String()
 
-	if body != `{"email":"bob1@bob.com","name":"bob1","guests":[{"name":"bobs friend","attending":true}]}` {
+	if body != `{"email":"bob1@bob.com","guests":[{"name":"bob1","attending":true},{"name":"bobs friend","attending":true}]}` {
 		t.Errorf("Expected a correct json body. Got %s", body)
 	}
 
 	// post update
-	postBody := `{"status":"attending"}`
-	postBodyReader := strings.NewReader(postBody)
+	//postBody := `{"status":"attending"}`
+	//postBodyReader := strings.NewReader(postBody)
 
 	// follow redirect
-	req, _ = http.NewRequest("POST", "/api/rsvp/1", postBodyReader)
-	req.Header.Set("Content-Type", "application/json")
-	response = executeRequest(req)
+	//req, _ = http.NewRequest("POST", "/api/rsvp/1", postBodyReader)
+	//req.Header.Set("Content-Type", "application/json")
+	//response = executeRequest(req)
 
-	checkResponseCode(t, http.StatusSeeOther, response.Code)
+	//checkResponseCode(t, http.StatusSeeOther, response.Code)
 
 	// check form
-	req, _ = http.NewRequest("GET", "/api/rsvp/1", nil)
-	log.Printf("Requesting GET /api/rsvp/1")
-	response = executeRequest(req)
+	//req, _ = http.NewRequest("GET", "/api/rsvp/1", nil)
+	//log.Printf("Requesting GET /api/rsvp/1")
+	//response = executeRequest(req)
 
-	checkResponseCode(t, http.StatusOK, response.Code)
+	//checkResponseCode(t, http.StatusOK, response.Code)
 
-	body = response.Body.String()
+	//body = response.Body.String()
 
-	if body != `{"status":"attending","email":"bob1@bob.com","name":"bob1","guests":[{"name":"bobs friend","attending":true}]}` {
-		t.Errorf("Expected a correct json body. Got %s", body)
-	}
-}
-
-func canUpdateRsvpViaRestWithInvalidStatus(t *testing.T) {
-	clearTestData(t, a)
-	req, _ := http.NewRequest("GET", "/api/rsvp/1", nil)
-	response := executeRequest(req)
-	checkResponseCode(t, http.StatusOK, response.Code)
-
-	body := response.Body.String()
-
-	if body != `{"email":"bob1@bob.com","name":"bob1","guests":[{"name":"bobs friend","attending":true}]}` {
-		t.Errorf("Expected a correct json body. Got %s", body)
-	}
-
-	// post update
-	postBody := `{"status":"someithing else"}`
-	postBodyReader := strings.NewReader(postBody)
-
-	// follow redirect
-	req, _ = http.NewRequest("POST", "/api/rsvp/1", postBodyReader)
-	req.Header.Set("Content-Type", "application/json")
-	response = executeRequest(req)
-
-	checkResponseCode(t, http.StatusBadRequest, response.Code)
-
-	body = response.Body.String()
-	if body != `{"error":"Status must be 'attending' or 'notattending'"}` {
-		t.Errorf("Expected a correct json body. Got %s", body)
-	}
+	//if body != `{"status":"attending","email":"bob1@bob.com","guests":[{"name":"bob1","attending":true},{"name":"bobs friend","attending":true}]}` {
+	//	t.Errorf("Expected a correct json body. Got %s", body)
+	//}
 }
 
 func clearTestData(t *testing.T, a App) {
 	batch := []string{
 		`DELETE FROM rsvp;`,
-		`INSERT INTO rsvp (rsvp_id, status, email, name, comments) VALUES ('1', '', 'bob1@bob.com','bob1','');`,
-		`INSERT INTO rsvp (rsvp_id, status, email, name, comments) VALUES ('2', '', 'bob2@bob.com','bob2','');`,
-		`INSERT INTO rsvp (rsvp_id, status, email, name, comments) VALUES ('3', '', 'bob3@bob.com','bob3','');`,
-		`INSERT INTO rsvp (rsvp_id, status, email, name, comments) VALUES ('4', '', 'bob4@bob.com','bob4','');`,
-		`INSERT INTO rsvp (rsvp_id, status, email, name, comments) VALUES ('5', '', 'bob5@bob.com','bob5','');`,
+		`INSERT INTO rsvp (rsvp_id, email) VALUES ('1', 'bob1@bob.com');`,
+		`INSERT INTO rsvp (rsvp_id, email) VALUES ('2', 'bob2@bob.com');`,
+		`INSERT INTO rsvp (rsvp_id, email) VALUES ('3', 'bob3@bob.com');`,
+		`INSERT INTO rsvp (rsvp_id, email) VALUES ('4', 'bob4@bob.com');`,
+		`INSERT INTO rsvp (rsvp_id, email) VALUES ('5', 'bob5@bob.com');`,
 		`DELETE FROM guests;`,
+		`INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('1',1,'bob1','');`,
 		`INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('1',1,'bobs friend','');`,
+		`INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('2',1,'bob2','');`,
+		`INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('3',1,'bob3','');`,
 		`INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('3',1,'friend 1','');`,
 		`INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('3',0,'friend 2','');`,
+		`INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('4',1,'bob4','');`,
+		`INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('5',1,'bob5','');`,
 	}
 
 	for _, b := range batch {

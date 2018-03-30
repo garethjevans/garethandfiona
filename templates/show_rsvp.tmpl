@@ -34,47 +34,26 @@
                 </div>
                 <div class="card-body">
                   <form method="post" action="/rsvp/{{ .Rsvp.RsvpID }}/save">
-{{if eq .Rsvp.Status "attending"}}
-                    <h2>You're Coming!</h2>
-{{else if eq .Rsvp.Status "notattending"}}
-                    <h2>Sorry you can't make it</h2>
-{{end}}
                     <div class="form-row">
-                      <div class="form-group col-md-6">
-                        <label for="Name">Name</label>
-                        <input type="text" class="form-control" name="Name" placeholder="Name" value="{{ .Rsvp.Name }}">
-                      </div>
-                      <div class="form-group col-md-6">
-                        <label for="Email">Email</label>
-                        <input type="email" class="form-control" name="Email" placeholder="Email" value="{{ .Rsvp.Email }}">
-                      </div>
+                      <div class="form-group col-md-4">Name</div>
+                      <div class="form-group col-md-4">Attending</div>
+                      <div class="form-group col-md-4">Comments</div>
                     </div>
-                    <div class="form-group">
-                      <label for="Comments">Comments / Requirements</label>
-                      <input type="text" class="form-control" name="Comments" placeholder="Dietry Requirements" value="{{ .Rsvp.Comments }}">
-                    </div>
-{{if .Rsvp.Guests}}
-                    <h2>Guests</h2>
 {{range $index, $person := .Rsvp.Guests}}
                     <div class="form-row">
                       <div class="form-group col-md-4">
-                        <label for="Rsvp.Guests.{{ $index }}.Name">Name</label>
                         <input type="text" class="form-control" name="Guests.{{ $index }}.Name" value="{{ $person.Name }}">
                       </div>
                       <div class="form-group col-md-4">
-                        <label for="Rsvp.Guests.{{ $index }}.Comments">Comments</label>
-                        <input type="text" class="form-control" name="Guests.{{ $index }}.Comments" value="{{ $person.Comments }}">
-                      </div>
-                      <div class="form-group col-md-4">
-                        <p>Attending</p>
                         <label class="radio-inline"><input type="radio" class="form-control" name="Guests.{{ $index }}.Attending" value="true"{{ if $person.Attending }} checked{{end}}>Yes</label>
                         <label class="radio-inline"><input type="radio" class="form-control" name="Guests.{{ $index }}.Attending" value="false"{{ if not $person.Attending }} checked{{end}}>No</label>
                       </div>
+                      <div class="form-group col-md-4">
+                        <input type="text" class="form-control" name="Guests.{{ $index }}.Comments" value="{{ $person.Comments }}">
+                      </div>
                     </div>
 {{end}}
-{{end}}
-                    <button type="submit" class="btn btn-primary" name="Status" value="attending">I'm Coming</button>
-                    <button type="submit" class="btn btn-primary" name="Status" value="notattending">Sorry, can't make it</button>
+                    <button type="submit" class="btn btn-primary">RSVP</button>
                   </form>
                 </div>
               </div>
