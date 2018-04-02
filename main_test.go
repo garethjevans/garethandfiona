@@ -29,6 +29,7 @@ func TestApp(t *testing.T) {
 	}
 
 	t.Run("homePageViaWeb", homePageViaWeb)
+	t.Run("pingPageViaWeb", pingPageViaWeb)
 	t.Run("showRsvpViaWeb", showRsvpViaWeb)
 	t.Run("showInviteViaWeb", showInviteViaWeb)
 	t.Run("canUpdateRsvpViaWeb", canUpdateRsvpViaWeb)
@@ -51,6 +52,18 @@ func homePageViaWeb(t *testing.T) {
 
 	if body := response.Body.String(); !strings.Contains(body, "<h1>Fiona &amp; Gareth</h1>") {
 		t.Errorf("Expected a correct title. Got %s", body)
+	}
+}
+
+func pingPageViaWeb(t *testing.T) {
+	clearTestData(t, a)
+	req, _ := http.NewRequest("GET", "/ping", nil)
+	response := executeRequest(req)
+
+	checkResponseCode(t, http.StatusOK, response.Code)
+
+	if body := response.Body.String(); !strings.Contains(body, "OK") {
+		t.Errorf("Expected a correct body. Got %s", body)
 	}
 }
 

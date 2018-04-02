@@ -57,7 +57,7 @@ section h2 {
 
 #mainNav {
   border-color: rgba(34, 34, 34, 0.05);
-  background-color: transparent;
+  background-color: rgba(0,0,0,0.2);
   -webkit-transition: all .35s;
   -moz-transition: all .35s;
   transition: all .35s;
@@ -81,7 +81,7 @@ section h2 {
 #mainNav .navbar-toggler {
   font-size: 12px;
   padding: 8px 10px;
-  color: #222222;
+  color: white;
 }
 
 #mainNav .navbar-nav > li > a {
@@ -101,7 +101,7 @@ section h2 {
 
 #mainNav .navbar-nav > li > a,
 #mainNav .navbar-nav > li > a:focus {
-  color: #222222;
+  color: white;
 }
 
 #mainNav .navbar-nav > li > a:hover,

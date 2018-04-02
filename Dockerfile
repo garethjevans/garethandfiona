@@ -3,8 +3,7 @@ FROM golang:1.9
 ADD . /go/src/garethandfiona
 
 RUN cd /go/src/garethandfiona && \
-   make build && \
-   ls -al
+   make build
 
 EXPOSE 8080
 
