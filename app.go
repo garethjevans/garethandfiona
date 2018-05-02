@@ -181,7 +181,13 @@ func (a *App) SaveRsvp(w http.ResponseWriter, r *http.Request) {
 	item.ReplyType = "web"
 	a.DB.UpdateRsvp(item)
 
-	target := "http://" + r.Host + "/rsvp/" + item.RsvpID
+	if item.IsAttending() {
+		target := "http://" + r.Host + "/attending"
+		log.Print("Sending Redirect: " + target)
+		http.Redirect(w, r, target, http.StatusSeeOther)
+	}
+
+	target := "http://" + r.Host + "/notattending"
 	log.Print("Sending Redirect: " + target)
 	http.Redirect(w, r, target, http.StatusSeeOther)
 }
@@ -240,6 +246,8 @@ func (a *App) initializeRoutes(nr newrelic.Application) {
 	a.Router.HandleFunc(newrelic.WrapHandleFunc(nr, "/", a.handler))
 	a.Router.HandleFunc(newrelic.WrapHandleFunc(nr, "/ping", a.handler))
 	a.Router.HandleFunc(newrelic.WrapHandleFunc(nr, "/api", a.handler))
+	a.Router.HandleFunc(newrelic.WrapHandleFunc(nr, "/attending", a.handler))
+	a.Router.HandleFunc(newrelic.WrapHandleFunc(nr, "/notattending", a.handler))
 
 	// web calls
 	a.Router.HandleFunc(newrelic.WrapHandleFunc(nr, "/invite/{id}", a.ShowInvite)).Methods("GET")

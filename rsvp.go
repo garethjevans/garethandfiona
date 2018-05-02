@@ -58,6 +58,15 @@ func (r *Rsvp) WelcomeMessage() string {
 	return ""
 }
 
+func (r *Rsvp) IsAttending() bool {
+	for _, g := range r.Guests {
+		if g.Attending {
+			return true
+		}
+	}
+	return false
+}
+
 func (g *Guest) String() string {
 	return fmt.Sprintf("Guest(ID:%d, RsvpID:%s, Name:%s, Attending:%t, Comments:%s)", g.ID, g.RsvpID, g.Name, g.Attending, g.Comments)
 }
