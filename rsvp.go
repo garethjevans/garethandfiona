@@ -6,18 +6,20 @@ import (
 )
 
 type Rsvp struct {
-	ID       int64      `json:"-" schema:"-"`
-	RsvpID   string     `json:"-" schema:"-"`
-	RsvpDate *time.Time `json:"-" schema:"-"`
-	Email    string     `json:"email,omitempty"`
-	Guests   []*Guest   `json:"guests,omitempty"`
+	ID          int64      `json:"-" schema:"-"`
+	RsvpID      string     `json:"-" schema:"-"`
+	RsvpDate    *time.Time `json:"-" schema:"-"`
+	ReplyType   string     `json:"-" schema:"-"`
+	ReplyStatus string     `json:"status,omitempty" schema:"-"`
+	Email       string     `json:"email,omitempty"`
+	Guests      []*Guest   `json:"guests,omitempty"`
 }
 
 type Guest struct {
 	ID        int64  `json:"-" schema:"-"`
 	RsvpID    string `json:"-" schema:"-"`
 	Name      string `json:"name,omitempty"`
-	Attending bool   `json:"attending,omitempty"`
+	Attending bool   `json:"attending"`
 	Comments  string `json:"comments,omitempty"`
 }
 

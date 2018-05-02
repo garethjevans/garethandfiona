@@ -14,18 +14,20 @@ var createTableStatements = []string{
 	`CREATE DATABASE IF NOT EXISTS wedding DEFAULT CHARACTER SET = 'utf8' DEFAULT COLLATE 'utf8_general_ci';`,
 	`USE wedding;`,
 	`CREATE TABLE IF NOT EXISTS rsvp (
-		id        INT UNSIGNED NOT NULL AUTO_INCREMENT, 
-		rsvp_id   CHAR(36) NOT NULL,
-		rsvp_date DATETIME NULL,
-		email     VARCHAR(255) NOT NULL,
+		id           INT UNSIGNED NOT NULL AUTO_INCREMENT, 
+		rsvp_id      CHAR(36) NOT NULL,
+		rsvp_date    DATETIME NULL,
+		reply_type   VARCHAR(255) NOT NULL,
+		reply_status VARCHAR(255) NOT NULL,
+		email        VARCHAR(255) NOT NULL,
 		PRIMARY KEY (id)
 	)`,
 	`CREATE TABLE IF NOT EXISTS guests (
 		id INT UNSIGNED NOT NULL AUTO_INCREMENT, 
-		rsvp_id CHAR(36) NOT NULL,
-        attending TINYINT(1) NOT NULL,
-		name VARCHAR(255) NOT NULL,
-		comments VARCHAR(255) NULL,
+		rsvp_id      CHAR(36) NOT NULL,
+        attending    TINYINT(1) NOT NULL,
+		name         VARCHAR(255) NOT NULL,
+		comments     VARCHAR(255) NULL,
 		PRIMARY KEY (id)
 	)`,
 }
@@ -116,22 +118,26 @@ type rowScanner interface {
 
 func scanRsvp(s rowScanner) (*Rsvp, error) {
 	var (
-		id        int64
-		rsvp_id   sql.NullString
-		rsvp_date mysql.NullTime
-		email     sql.NullString
+		id           int64
+		rsvp_id      sql.NullString
+		rsvp_date    mysql.NullTime
+		reply_type   sql.NullString
+		reply_status sql.NullString
+		email        sql.NullString
 	)
 
-	if err := s.Scan(&id, &rsvp_id, &rsvp_date, &email); err != nil {
+	if err := s.Scan(&id, &rsvp_id, &rsvp_date, &reply_type, &reply_status, &email); err != nil {
 		return nil, err
 	}
 
 	log.Printf("Date is valid - %t", rsvp_date.Valid)
 
 	Rsvp := &Rsvp{
-		ID:     id,
-		RsvpID: rsvp_id.String,
-		Email:  email.String,
+		ID:          id,
+		RsvpID:      rsvp_id.String,
+		ReplyType:   reply_type.String,
+		ReplyStatus: reply_status.String,
+		Email:       email.String,
 	}
 
 	if rsvp_date.Valid {
@@ -164,7 +170,7 @@ func scanGuest(s rowScanner) (*Guest, error) {
 	return Guest, nil
 }
 
-const getStatement = `SELECT id,rsvp_id,rsvp_date,email FROM rsvp WHERE rsvp_id = ?`
+const getStatement = `SELECT id,rsvp_id,rsvp_date,reply_type,reply_status,email FROM rsvp WHERE rsvp_id = ?`
 const getGuestsStatement = `SELECT id,rsvp_id,name,attending,comments FROM guests WHERE rsvp_id = ?`
 
 // GetRsvp retrieves a Rsvp by its ID.
@@ -213,7 +219,7 @@ func (db *mysqlDB) getGuestsByRsvpId(id string) ([]*Guest, error) {
 	return guests, nil
 }
 
-const updateStatement = `UPDATE rsvp SET rsvp_date=?, email=? WHERE id = ? AND rsvp_id = ?`
+const updateStatement = `UPDATE rsvp SET rsvp_date=?, reply_type=?, reply_status=?, email=? WHERE id = ? AND rsvp_id = ?`
 const updateGuestStatement = `UPDATE guests SET attending = ?, name = ?, comments = ? WHERE id = ? AND rsvp_id = ?`
 
 // UpdateRsvp updates the entry for a given Rsvp.
@@ -232,7 +238,7 @@ func (db *mysqlDB) UpdateRsvp(b *Rsvp) error {
 		b.RsvpDate = &now
 	}
 
-	_, err := execAffectingOneRow(db.update, b.RsvpDate, b.Email, b.ID, b.RsvpID)
+	_, err := execAffectingOneRow(db.update, b.RsvpDate, b.ReplyType, b.ReplyStatus, b.Email, b.ID, b.RsvpID)
 
 	for _, guest := range b.Guests {
 		db.updateGuestByGuest(guest)

@@ -149,11 +149,11 @@ func canUpdateRsvp(t *testing.T) {
 func clearTestDataForDatabase(t *testing.T, a App) {
 	batch := []string{
 		`DELETE FROM rsvp;`,
-		`INSERT INTO rsvp (rsvp_id, email) VALUES ('1', 'bob1@bob.com');`,
-		`INSERT INTO rsvp (rsvp_id, email) VALUES ('2', 'bob2@bob.com');`,
-		`INSERT INTO rsvp (rsvp_id, email) VALUES ('3', 'bob3@bob.com');`,
-		`INSERT INTO rsvp (rsvp_id, email) VALUES ('4', 'bob4@bob.com');`,
-		`INSERT INTO rsvp (rsvp_id, email) VALUES ('5', 'bob5@bob.com');`,
+		`INSERT INTO rsvp (rsvp_id, reply_type, reply_status, email) VALUES ('1', '', '', 'bob1@bob.com');`,
+		`INSERT INTO rsvp (rsvp_id, reply_type, reply_status, email) VALUES ('2', '', '', 'bob2@bob.com');`,
+		`INSERT INTO rsvp (rsvp_id, reply_type, reply_status, email) VALUES ('3', '', '', 'bob3@bob.com');`,
+		`INSERT INTO rsvp (rsvp_id, reply_type, reply_status, email) VALUES ('4', '', '', 'bob4@bob.com');`,
+		`INSERT INTO rsvp (rsvp_id, reply_type, reply_status, email) VALUES ('5', '', '', 'bob5@bob.com');`,
 		`DELETE FROM guests;`,
 		`INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('1',1,'bob1','');`,
 		`INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('1',1,'bobs friend','');`,

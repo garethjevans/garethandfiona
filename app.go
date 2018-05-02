@@ -178,6 +178,7 @@ func (a *App) SaveRsvp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	item.ReplyType = "web"
 	a.DB.UpdateRsvp(item)
 
 	target := "http://" + r.Host + "/rsvp/" + item.RsvpID
@@ -213,6 +214,19 @@ func (a *App) SaveRsvpRest(w http.ResponseWriter, r *http.Request) {
 		log.Print("Unable to decode rsvp:", err)
 		respondWithError(w, http.StatusNotFound, fmt.Sprintf("unable to decode rsvp: %s", err))
 		return
+	}
+
+	item.ReplyType = "api"
+	if item.ReplyStatus == "attending" {
+		for _, g := range item.Guests {
+			g.Attending = true
+		}
+	} else if item.ReplyStatus == "notattending" {
+		for _, g := range item.Guests {
+			g.Attending = false
+		}
+	} else {
+		respondWithError(w, http.StatusBadRequest, fmt.Sprintf("Invalid status %s", item.ReplyStatus))
 	}
 
 	a.DB.UpdateRsvp(item)

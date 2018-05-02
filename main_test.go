@@ -37,6 +37,7 @@ func TestApp(t *testing.T) {
 	t.Run("showRsvpViaRest", showRsvpViaRest)
 	t.Run("showMissingRsvpViaRest", showMissingRsvpViaRest)
 	t.Run("canUpdateRsvpViaRest", canUpdateRsvpViaRest)
+	t.Run("canUpdateRsvpViaRestWhenNotAttending", canUpdateRsvpViaRestWhenNotAttending)
 
 	// <tear-down code>
 	log.Printf("Rolling Back Transaction")
@@ -166,9 +167,7 @@ func showRsvpViaRest(t *testing.T) {
 	checkResponseCode(t, http.StatusOK, response.Code)
 
 	body := response.Body.String()
-	if body != `{"email":"bob1@bob.com","guests":[{"name":"bob1","attending":true},{"name":"bobs friend","attending":true}]}` {
-		t.Errorf("Expected a correct json body. Got %s", body)
-	}
+	assertStringEquals(t, "Expected a correct json body", `{"email":"bob1@bob.com","guests":[{"name":"bob1","attending":true},{"name":"bobs friend","attending":true}]}`, body)
 }
 
 func showMissingRsvpViaRest(t *testing.T) {
@@ -191,43 +190,70 @@ func canUpdateRsvpViaRest(t *testing.T) {
 
 	body := response.Body.String()
 
-	if body != `{"email":"bob1@bob.com","guests":[{"name":"bob1","attending":true},{"name":"bobs friend","attending":true}]}` {
-		t.Errorf("Expected a correct json body. Got %s", body)
-	}
+	assertStringEquals(t, "Expected a correct json body", `{"email":"bob1@bob.com","guests":[{"name":"bob1","attending":true},{"name":"bobs friend","attending":true}]}`, body)
 
 	// post update
-	//postBody := `{"status":"attending"}`
-	//postBodyReader := strings.NewReader(postBody)
+	postBody := `{"status":"attending"}`
+	postBodyReader := strings.NewReader(postBody)
 
 	// follow redirect
-	//req, _ = http.NewRequest("POST", "/api/rsvp/1", postBodyReader)
-	//req.Header.Set("Content-Type", "application/json")
-	//response = executeRequest(req)
+	req, _ = http.NewRequest("POST", "/api/rsvp/1", postBodyReader)
+	req.Header.Set("Content-Type", "application/json")
+	response = executeRequest(req)
 
-	//checkResponseCode(t, http.StatusSeeOther, response.Code)
+	checkResponseCode(t, http.StatusSeeOther, response.Code)
 
 	// check form
-	//req, _ = http.NewRequest("GET", "/api/rsvp/1", nil)
-	//log.Printf("Requesting GET /api/rsvp/1")
-	//response = executeRequest(req)
+	req, _ = http.NewRequest("GET", "/api/rsvp/1", nil)
+	log.Printf("Requesting GET /api/rsvp/1")
+	response = executeRequest(req)
 
-	//checkResponseCode(t, http.StatusOK, response.Code)
+	checkResponseCode(t, http.StatusOK, response.Code)
+	body = response.Body.String()
 
-	//body = response.Body.String()
+	assertStringEquals(t, "Expected a correct json body", `{"status":"attending","email":"bob1@bob.com","guests":[{"name":"bob1","attending":true},{"name":"bobs friend","attending":true}]}`, body)
+}
 
-	//if body != `{"status":"attending","email":"bob1@bob.com","guests":[{"name":"bob1","attending":true},{"name":"bobs friend","attending":true}]}` {
-	//	t.Errorf("Expected a correct json body. Got %s", body)
-	//}
+func canUpdateRsvpViaRestWhenNotAttending(t *testing.T) {
+	clearTestData(t, a)
+	req, _ := http.NewRequest("GET", "/api/rsvp/1", nil)
+	response := executeRequest(req)
+	checkResponseCode(t, http.StatusOK, response.Code)
+
+	body := response.Body.String()
+
+	assertStringEquals(t, "Expected a correct json body", `{"email":"bob1@bob.com","guests":[{"name":"bob1","attending":true},{"name":"bobs friend","attending":true}]}`, body)
+
+	// post update
+	postBody := `{"status":"notattending"}`
+	postBodyReader := strings.NewReader(postBody)
+
+	// follow redirect
+	req, _ = http.NewRequest("POST", "/api/rsvp/1", postBodyReader)
+	req.Header.Set("Content-Type", "application/json")
+	response = executeRequest(req)
+
+	checkResponseCode(t, http.StatusSeeOther, response.Code)
+
+	// check form
+	req, _ = http.NewRequest("GET", "/api/rsvp/1", nil)
+	log.Printf("Requesting GET /api/rsvp/1")
+	response = executeRequest(req)
+
+	checkResponseCode(t, http.StatusOK, response.Code)
+	body = response.Body.String()
+
+	assertStringEquals(t, "Expected a correct json body", `{"status":"notattending","email":"bob1@bob.com","guests":[{"name":"bob1","attending":false},{"name":"bobs friend","attending":false}]}`, body)
 }
 
 func clearTestData(t *testing.T, a App) {
 	batch := []string{
 		`DELETE FROM rsvp;`,
-		`INSERT INTO rsvp (rsvp_id, email) VALUES ('1', 'bob1@bob.com');`,
-		`INSERT INTO rsvp (rsvp_id, email) VALUES ('2', 'bob2@bob.com');`,
-		`INSERT INTO rsvp (rsvp_id, email) VALUES ('3', 'bob3@bob.com');`,
-		`INSERT INTO rsvp (rsvp_id, email) VALUES ('4', 'bob4@bob.com');`,
-		`INSERT INTO rsvp (rsvp_id, email) VALUES ('5', 'bob5@bob.com');`,
+		`INSERT INTO rsvp (rsvp_id, reply_type, reply_status, email) VALUES ('1', '', '', 'bob1@bob.com');`,
+		`INSERT INTO rsvp (rsvp_id, reply_type, reply_status, email) VALUES ('2', '', '', 'bob2@bob.com');`,
+		`INSERT INTO rsvp (rsvp_id, reply_type, reply_status, email) VALUES ('3', '', '', 'bob3@bob.com');`,
+		`INSERT INTO rsvp (rsvp_id, reply_type, reply_status, email) VALUES ('4', '', '', 'bob4@bob.com');`,
+		`INSERT INTO rsvp (rsvp_id, reply_type, reply_status, email) VALUES ('5', '', '', 'bob5@bob.com');`,
 		`DELETE FROM guests;`,
 		`INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('1',1,'bob1','');`,
 		`INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('1',1,'bobs friend','');`,
@@ -244,6 +270,12 @@ func clearTestData(t *testing.T, a App) {
 		if err != nil {
 			t.Fatalf("sql.Exec: Error: %s\n", err)
 		}
+	}
+}
+
+func assertStringEquals(t *testing.T, message string, expected string, actual string) {
+	if expected != actual {
+		t.Errorf("%s. Expected: %s Actual: %s", message, expected, actual)
 	}
 }
 
