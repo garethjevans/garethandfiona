@@ -21,9 +21,9 @@ println "DELETE FROM guests;"
 def int invites = 0;
 def int guests = 0;
 
-records.findAll{ !it.unlikely }.groupBy{ it.email }.each{ k,v -> 
+records.findAll{ it.email }.findAll{ !it.unlikely }.groupBy{ it.email }.each{ k,v -> 
 	def id = UUID.randomUUID().toString()
-	println "INSERT INTO rsvp (rsvp_id, email) VALUES ('${id}', '${k}');"
+	println "INSERT INTO rsvp (rsvp_id, reply_type, reply_status, email) VALUES ('${id}', '', '', '${k}');"
 	invites++
 	v.each { g -> 
 		println "INSERT INTO guests (rsvp_id, attending, name, comments) VALUES ('${id}',1,'${g.name}','');"
