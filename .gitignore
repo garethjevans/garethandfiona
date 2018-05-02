@@ -30,3 +30,4 @@ vendor/
 !/static/vendor/
 manifest.yml
 garethandfiona
+*.sql
