@@ -34,26 +34,40 @@
                 </div>
                 <div class="card-body">
                   <form method="post" action="/rsvp/{{ .Rsvp.RsvpID }}/save">
-                    <div class="form-row">
-                      <div class="form-group col-md-4">Name</div>
-                      <div class="form-group col-md-4">Attending</div>
-                      <div class="form-group col-md-4">Comments</div>
-                    </div>
 {{range $index, $person := .Rsvp.Guests}}
                     <div class="form-row">
-                      <div class="form-group col-md-4">
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">Name</span>
+                        </div>
                         <input type="text" class="form-control" name="Guests.{{ $index }}.Name" value="{{ $person.Name }}">
                       </div>
-                      <div class="form-group col-md-4">
-                        <label class="radio-inline"><input type="radio" class="form-control" name="Guests.{{ $index }}.Attending" value="true"{{ if $person.Attending }} checked{{end}}>Yes</label>
-                        <label class="radio-inline"><input type="radio" class="form-control" name="Guests.{{ $index }}.Attending" value="false"{{ if not $person.Attending }} checked{{end}}>No</label>
+                    </div>
+                    <div class="form-row">
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">Attending</span>
+                        </div>
+                        <div class="form-check form-check-inline">
+                          <label class="form-check-label">Yes</label>
+                          <input type="radio" class="form-check-input" name="Guests.{{ $index }}.Attending" value="true"{{ if $person.Attending }} checked{{end}}>
+                          <label class="form-check-label">No</label>
+                          <input type="radio" class="form-check-input" name="Guests.{{ $index }}.Attending" value="false"{{ if not $person.Attending }} checked{{end}}>
+                        </div>
                       </div>
-                      <div class="form-group col-md-4">
+                    </div>
+                    <div class="form-row">
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text">Comments</span>
+                        </div>
                         <input type="text" class="form-control" name="Guests.{{ $index }}.Comments" value="{{ $person.Comments }}">
                       </div>
                     </div>
 {{end}}
-                    <button type="submit" class="btn btn-primary">RSVP</button>
+                    <div class="form-row">
+                      <button type="submit" class="btn btn-primary">RSVP</button>
+                    </div>
                   </form>
                 </div>
               </div>
