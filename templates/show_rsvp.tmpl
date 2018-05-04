@@ -32,7 +32,7 @@
                 <div class="card-header">
                   <h2>RSVP</h2>
                 </div>
-                <div class="card-body">
+                <div class="card-body rsvp">
                   <form method="post" action="/rsvp/{{ .Rsvp.RsvpID }}/save">
 {{range $index, $person := .Rsvp.Guests}}
                     <div class="form-row">
@@ -65,7 +65,7 @@
                       </div>
                     </div>
 {{end}}
-                    <div class="form-row">
+                    <div class="form-row center-block text-center">
                       <button type="submit" class="btn btn-primary">RSVP</button>
                     </div>
                   </form>

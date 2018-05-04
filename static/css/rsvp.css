@@ -480,8 +480,16 @@ footer ul li a:hover, footer ul li a:focus, footer ul li a:active, footer ul li 
   height: 375px;
 }
 
-.card-body {
+.invite {
+  text-align: center;
+}
+
+.rsvp {
   text-align: left;
+}
+
+.center {
+  text-align: center;
 }
 
 .card-header {
