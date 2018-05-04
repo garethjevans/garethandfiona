@@ -110,10 +110,10 @@ func canUpdateRsvpViaWeb(t *testing.T) {
 	if !strings.Contains(body, `<input type="text" class="form-control" name="Guests.0.Comments" value="">`) {
 		t.Errorf("Expected a correct guest 1 comments. Got %s", body)
 	}
-	if !strings.Contains(body, `<label class="radio-inline"><input type="radio" class="form-control" name="Guests.0.Attending" value="true" checked>Yes</label>`) {
+	if !strings.Contains(body, `<input type="radio" class="form-check-input" name="Guests.0.Attending" value="true" checked>`) {
 		t.Errorf("Expected a correct guest 1 attending. Got %s", body)
 	}
-	if !strings.Contains(body, `<label class="radio-inline"><input type="radio" class="form-control" name="Guests.0.Attending" value="false">No</label>`) {
+	if !strings.Contains(body, `<input type="radio" class="form-check-input" name="Guests.0.Attending" value="false">`) {
 		t.Errorf("Expected a correct guest 1 attending. Got %s", body)
 	}
 
@@ -152,10 +152,10 @@ func canUpdateRsvpViaWeb(t *testing.T) {
 	if !strings.Contains(body, `<input type="text" class="form-control" name="Guests.1.Comments" value="Loves Eggs">`) {
 		t.Errorf("Expected a correct guest 1 comments. Got %s", body)
 	}
-	if !strings.Contains(body, `<input type="radio" class="form-control" name="Guests.1.Attending" value="true">`) {
+	if !strings.Contains(body, `<input type="radio" class="form-check-input" name="Guests.1.Attending" value="true">`) {
 		t.Errorf("Expected a correct guest 1 attending. Got %s", body)
 	}
-	if !strings.Contains(body, `<input type="radio" class="form-control" name="Guests.1.Attending" value="false" checked>`) {
+	if !strings.Contains(body, `<input type="radio" class="form-check-input" name="Guests.1.Attending" value="false" checked>`) {
 		t.Errorf("Expected a correct guest 1 attending. Got %s", body)
 	}
 }
