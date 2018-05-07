@@ -199,11 +199,11 @@ header.masthead .device-container .screen img {
   }
 }
 
-section.wedding {
+section {
   position: relative;
 }
 
-section.wedding h2 {
+section h2 {
   font-family: "Parisienne", Arial, serif;
   font-weight: bold;
   font-size: 40px;
@@ -212,323 +212,28 @@ section.wedding h2 {
   margin-bottom: 20px;
 }
 
-section.wedding .badges .badge-link {
+section .badges .badge-link {
   display: block;
   margin-bottom: 25px;
 }
 
-section.wedding .badges .badge-link:last-child {
+section .badges .badge-link:last-child {
   margin-bottom: 0;
 }
 
-section.wedding .badges .badge-link img {
+section .badges .badge-link img {
   height: 60px;
 }
 
 @media (min-width: 768px) {
-  section.wedding .badges .badge-link {
+  section .badges .badge-link {
     display: inline-block;
     margin-bottom: 0;
   }
 }
 
 @media (min-width: 768px) {
-  section.wedding h2 {
-    font-family: "Parisienne", Arial, serif;
-    font-weight: bold;
-    font-size: 70px;
-  }
-}
-
-section.hotels .section-heading {
-  margin-bottom: 100px;
-}
-
-@media (min-width: 768px) {
-  section.hotels h2 {
-    font-family: "Parisienne", Arial, serif;
-    font-weight: bold;
-    font-size: 70px;
-  }
-}
-
-section.hotels h2 {
-  font-family: "Parisienne", Arial, serif;
-  font-weight: bold;
-  color: #333538;
-  margin-top: 0;
-  margin-bottom: 20px;
-}
-
-section.hotels .section-heading h2 {
-  margin-top: 0;
-}
-
-section.hotels .section-heading p {
-  margin-bottom: 0;
-}
-
-section.hotels .device-container,
-section.hotels .feature-item {
-  max-width: 325px;
-  margin: 0 auto;
-}
-
-section.hotels .device-container {
-  margin-bottom: 100px;
-}
-
-@media (min-width: 992px) {
-  section.hotels .device-container {
-    margin-bottom: 0;
-  }
-}
-
-section.hotels .feature-item {
-  padding-top: 50px;
-  padding-bottom: 50px;
-  text-align: center;
-}
-
-section.hotels .feature-item h3 {
-  font-size: 30px;
-}
-
-section.hotels .feature-item i {
-  font-size: 80px;
-  display: block;
-  margin-bottom: 15px;
-  background: -webkit-linear-gradient(to left, #7b4397, #dc2430);
-  background: linear-gradient(to left, #7b4397, #dc2430);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-section.directions {
-  position: relative;
-}
-
-section.directions .directions-content {
-  position: relative;
-  z-index: 1;
-}
-
-section.directions h2 {
-  font-family: "Parisienne", Arial, serif;
-  font-weight: bold;
-  font-size: 40px;
-  color: #333538;
-  margin-top: 0;
-  margin-bottom: 20px;
-}
-
-section.directions h5 {
-  font-family: "Work Sans", Arial, serif;
-  font-size: 25px;
-  color: black;
-  margin-top: 0;
-  margin-bottom: 5px;
-}
-
-section.directions .directions-content h2 {
-  font-size: 50px;
-  margin-top: 0;
-  margin-bottom: 25px;
-  color: #333538;
-}
-
-@media (min-width: 768px) {
-  section.directions .directions-content h2 {
-    font-size: 70px;
-  }
-}
-
-section.directions .overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-}
-
-section.gifts {
-  position: relative;
-}
-
-section.gifts .gifts-content {
-  position: relative;
-  z-index: 1;
-}
-
-section.gifts h2 {
-  font-family: "Parisienne", Arial, serif;
-  font-weight: bold;
-  font-size: 40px;
-  color: #333538;
-  margin-top: 0;
-  margin-bottom: 20px;
-}
-
-section.gifts h5 {
-  font-family: "Work Sans", Arial, serif;
-  font-size: 25px;
-  color: black;
-  margin-top: 0;
-  margin-bottom: 5px;
-}
-
-section.gifts .gifts-content h2 {
-  font-size: 50px;
-  margin-top: 0;
-  margin-bottom: 25px;
-  color: #333538;
-}
-
-section.gifts .gifts-content i {
-  font-size: 50px;
-  color: #333538 !important;
-  padding: 20px !important;
-}
-
-@media (min-width: 768px) {
-  section.gifts .gifts-content h2 {
-    font-size: 70px;
-  }
-}
-
-section.gifts .overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-}
-section.contact {
-  position: relative;
-}
-
-section.contact .contact-content {
-  position: relative;
-  z-index: 1;
-}
-
-section.contact h2 {
-  font-family: "Parisienne", Arial, serif;
-  font-weight: bold;
-  font-size: 40px;
-  color: #333538;
-  margin-top: 0;
-  margin-bottom: 20px;
-}
-
-section.contact h5 {
-  font-family: "Work Sans", Arial, serif;
-  font-size: 25px;
-  color: black;
-  margin-top: 0;
-  margin-bottom: 5px;
-}
-
-section.contact .contact-content h2 {
-  font-size: 50px;
-  margin-top: 0;
-  margin-bottom: 25px;
-  color: #333538;
-}
-
-@media (min-width: 768px) {
-  section.contact .contact-content h2 {
-    font-size: 70px;
-  }
-}
-
-section.contact .overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-}
-
-section.contact {
-  text-align: center;
-}
-
-section.contact h2 {
-  margin-top: 0;
-  margin-bottom: 25px;
-}
-
-section.contact h2 i {
-  color: #dd4b39;
-}
-
-section.contact i {
-  font-size: 50px;
-  color: #333538 !important;
-  padding: 20px !important;
-}
-
-section.contact ul.list-social {
-  margin-bottom: 0;
-}
-
-section.contact ul.list-social li a {
-  font-size: 40px;
-  line-height: 80px;
-  display: block;
-  width: 80px;
-  height: 80px;
-  color: white;
-  border-radius: 100%;
-}
-
-section.contact ul.list-social li.social-instagram a {
-  background-color: #1da1f2;
-}
-
-section.contact ul.list-social li.social-instagram a:hover {
-  background-color: #0d95e8;
-}
-
-section.rsvp {
-  position: relative;
-}
-
-section.rsvp h2 {
-  font-family: "Parisienne", Arial, serif;
-  font-weight: bold;
-  font-size: 40px;
-  color: #333538;
-  margin-top: 0;
-  margin-bottom: 20px;
-}
-
-section.rsvp .badges .badge-link {
-  display: block;
-  margin-bottom: 25px;
-}
-
-section.rsvp .badges .badge-link:last-child {
-  margin-bottom: 0;
-}
-
-section.rsvp .badges .badge-link img {
-  height: 60px;
-}
-
-@media (min-width: 768px) {
-  section.rsvp .badges .badge-link {
-    display: inline-block;
-    margin-bottom: 0;
-  }
-}
-
-@media (min-width: 768px) {
-  section.rsvp h2 {
+  section h2 {
     font-family: "Parisienne", Arial, serif;
     font-weight: bold;
     font-size: 70px;
@@ -561,7 +266,7 @@ footer ul li a:hover, footer ul li a:focus, footer ul li a:active, footer ul li 
 }
 
 .bg-primary {
-  background: url("../img/kraft_card.jpg");
+  background: url("../img/wedding_poems.jpg");
   background-position: center;
   -webkit-background-size: cover;
   -moz-background-size: cover;
@@ -663,8 +368,8 @@ footer ul li a:hover, footer ul li a:focus, footer ul li a:active, footer ul li 
 }
 
 .event-wrap-dark {
-  border: 2px solid rgba(255, 255, 255, 0.5);
-  background: rgba(255, 248, 220, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  background: rgba(255, 248, 220, 0.8);
   padding: 30px;
   width: 100%;
   float: left;
@@ -674,8 +379,8 @@ footer ul li a:hover, footer ul li a:focus, footer ul li a:active, footer ul li 
   border-radius: 4px;
 }
 .event-wrap {
-  border: 2px solid rgba(255, 255, 255, 0.5);
-  background: rgba(0, 0, 0, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  background: rgba(0, 0, 0, 0.8);
   padding: 30px;
   width: 100%;
   float: left;
