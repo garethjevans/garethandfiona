@@ -180,9 +180,9 @@ func (a *App) SaveRsvp(w http.ResponseWriter, r *http.Request) {
 
 	item.ReplyType = "web"
 	if item.IsAttending() {
-		item.ReplyType = "attending"
+		item.ReplyStatus = "attending"
 	} else {
-		item.ReplyType = "notattending"
+		item.ReplyStatus = "notattending"
 	}
 
 	a.DB.UpdateRsvp(item)
