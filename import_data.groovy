@@ -3,15 +3,13 @@
 @Grab('com.xlson.groovycsv:groovycsv:1.3')
 import com.xlson.groovycsv.CsvParser
 
-def file = new File("/scripts/guests.csv")
+def file = new File(args[0])
 def cvsData = new CsvParser().parse(file.text)
 
 def records = cvsData.collect{ it ->
-	// Name,email address,day or evening,unlikely,Save the date,Invite sent,RSVP,accomodation booked,,,,,Maybes
     def d = [:]
     d['name'] = it.Name
-    d['email'] = it.'email address'
-    d['unlikely'] = (it.'unlikely' == 'y')
+    d['email'] = it.Email
 	d
 }
 
@@ -21,7 +19,7 @@ println "DELETE FROM guests;"
 def int invites = 0;
 def int guests = 0;
 
-records.findAll{ it.email }.findAll{ !it.unlikely }.groupBy{ it.email }.each{ k,v -> 
+records.findAll{ it.email }.groupBy{ it.email }.each{ k,v -> 
 	def id = UUID.randomUUID().toString()
 	println "INSERT INTO rsvp (rsvp_id, reply_type, reply_status, email) VALUES ('${id}', '', '', '${k}');"
 	invites++
