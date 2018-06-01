@@ -31,3 +31,4 @@ vendor/
 manifest.yml
 garethandfiona
 *.sql
+*.csv
