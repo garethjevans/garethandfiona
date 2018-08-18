@@ -1,5 +1,5 @@
 hash: a34bf349964b9cb51d5e32976406d7fc7b3a7577f3b00c088cdf0e4e75ca2168
-updated: 2018-03-27T10:48:34.584091005Z
+updated: 2018-08-18T13:38:05.712308548+01:00
 imports:
 - name: github.com/go-sql-driver/mysql
   version: 1a676ac6e4dce68e9303a1800773861350374a9e
@@ -21,7 +21,7 @@ imports:
   - internal/sysinfo
   - internal/utilization
 - name: google.golang.org/appengine
-  version: 5bee14b453b4c71be47ec1781b0fa61c2ea182db
+  version: 4216e58b9158e5f1c906f1aca75162a46a2ec88a
   subpackages:
   - cloudsql
 - name: gopkg.in/mgo.v2
